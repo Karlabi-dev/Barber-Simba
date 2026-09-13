@@ -63,3 +63,29 @@
 @keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(340%); } }
 @media (min-width: 700px) { body { padding: 24px 0; }.app-shell { min-height: 900px; border-radius: 28px; }.loading-screen { width: 410px; min-height: 900px; margin: 24px auto; border-radius: 28px; box-shadow: 0 0 35px #3921161c; }.success-final { min-height: 820px; } }
 @media (max-width: 370px) { .screen-content { padding-inline: 14px; }.hero-card { padding: 20px; }.navbar { left: 14px; right: 14px; }.appointment-time { gap: 8px; }.service-card { padding: 10px; }.field-row { grid-template-columns: 1fr; } }
+
+/* Identidade visual fiel ao protótipo Barber Simba */
+:root { --brown: #920014; --brown-dark: #090a0b; --gold: #e5c158; --cream: #18191b; --line: #292a2b; --muted: #a4a2a2; --green: #287a50; }
+.app-shell { color: #fafdfd; background: #090a0b; box-shadow: 0 0 35px #0008; }
+.status-bar { color: #fafdfd; }
+.brand, .brand span, .loading-brand, .loading-brand span { color: var(--gold); }
+.profile-button, .icon-button { color: var(--gold); background: #59010c; border-color: #73000e; }
+.page-header h1 { color: var(--gold); text-transform: uppercase; }
+.hero-card { background: linear-gradient(135deg, #121314, #251e1b); border: 1px solid #857551; }
+.hero-card span, .section-title a, .selected-service b, .service-action strong, .booking-summary b { color: var(--gold); }
+.appointment-card, .barber-card, .service-card { color: #fafdfd; background: #18191b; border-color: #292a2b; box-shadow: 0 5px 15px #0004; }
+.appointment-person em { color: #7fe0a6; background: #153b26; }
+.navbar { color: #fafdfd; background: #920014; border: 0; box-shadow: 0 8px 25px #0006; }
+.navbar a { color: #d6cccb; }.navbar .active { color: var(--gold); }.navbar .active img { filter: sepia(1) saturate(2); }
+.search { color: #fafdfd; background: #920014; border-color: #73000e; }.search input { color: #fafdfd; }.search input::placeholder { color: #d6cccb; }
+.small-button { color: #121314; background: var(--gold); font-weight: 700; }.service-action a { color: #fff; background: #920014; }
+.service-icon, .selected-service > span { background: #292a2b; }
+.selected-service { background: #18191b; border-color: #857551; }
+.booking-form input, .booking-form select, .booking-form textarea { color: #fafdfd; background: #18191b; border-color: #292a2b; }
+.button-primary { color: #121314; background: var(--gold); }.button-secondary { color: #121314; background: #fff; }
+.review-card { color: #121314; background: #fff; }.review-label, .review-person, .review-row { border-color: #e7e7e7; }
+.review-label em { color: #8b712c; background: #fff9d9; }.map-preview { color: var(--gold); background-color: #d9edd7; }
+.reminder { color: #47635e; background: #edfffb; border: 1px solid #cdeee7; }.reminder p { color: #47635e; }
+.loading-screen { color: var(--gold); background: #090a0b; }.loading-track { background: #292a2b; }.loading-track span { background: var(--gold); }
+.success-screen { background: #000; }.success-final .check-circle, .success-heading .check-circle { color: #fff; background: var(--gold); border-color: #edfffb; }
+.light-screen { color: #121314; background: #fafdfd; }.light-screen .status-bar { color: #121314; }.light-screen .professional-row { border-bottom-color: #d6cccb; }.light-screen .professional-copy p, .light-screen .professional-copy span { color: #6f6865; }
