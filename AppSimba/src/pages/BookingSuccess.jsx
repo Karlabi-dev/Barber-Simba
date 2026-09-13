@@ -6,8 +6,8 @@ import bell from '../assets/icons/sino.png'
 export default function BookingSuccess() {
   const navigate = useNavigate()
   return <AppShell nav={false} className="success-screen"><section className="success-final">
-    <span className="check-circle">✓</span><h1>Tudo pronto!</h1><p>Seu agendamento foi confirmado com sucesso.</p>
-    <div className="reminder"><img src={bell} alt="" /><p>Enviamos a confirmação e as instruções por WhatsApp e e-mail.</p></div>
+    <span className="check-circle">✓</span><h1>Tudo pronto!</h1><p>Agendamento de demonstração salvo neste navegador.</p>
+    <div className="reminder"><img src={bell} alt="" /><p>Demonstração: nenhum WhatsApp ou e-mail foi enviado.</p></div>
     <Button onClick={() => navigate('/home')}>Voltar para a Home</Button>
   </section></AppShell>
 }

@@ -8,7 +8,7 @@ export default function Header({ title, backTo, compact = false }) {
   </header>
 
   return <header className="brand-header">
-    <Link className="brand" to="/home"><span>♛</span> Simba</Link>
-    <Link className="profile-button" to="/profissionais" aria-label="Abrir perfil"><img src={profileIcon} alt="" /></Link>
+    <Link className="brand" to="/home">SIMBA</Link>
+    <Link className="profile-button" to="/perfil" aria-label="Abrir perfil"><img src={profileIcon} alt="" /></Link>
   </header>
 }

@@ -7,12 +7,14 @@ import Booking from './pages/Booking'
 import BookingReview from './pages/BookingReview'
 import BookingSuccess from './pages/BookingSuccess'
 import Loading from './pages/Loading'
+import Profile from './pages/Profile'
 
 export default function App() {
   return <BrowserRouter><Routes>
     <Route path="/" element={<Navigate to="/loading" replace />} />
     <Route path="/loading" element={<Loading />} />
     <Route path="/home" element={<Home />} />
+    <Route path="/perfil" element={<Profile />} />
     <Route path="/profissionais" element={<Professionals />} />
     <Route path="/servicos" element={<Services />} />
     <Route path="/agendamento" element={<Booking />} />

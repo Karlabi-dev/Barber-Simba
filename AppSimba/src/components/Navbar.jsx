@@ -8,7 +8,7 @@ const items = [
   { to: '/home', label: 'Home', icon: homeIcon },
   { to: '/agendamento', label: 'Agendas', icon: calendarIcon },
   { to: '/servicos', label: 'Serviços', icon: servicesIcon },
-  { to: '/profissionais', label: 'Perfil', icon: profileIcon },
+  { to: '/perfil', label: 'Perfil', icon: profileIcon },
 ]
 
 export default function Navbar() {

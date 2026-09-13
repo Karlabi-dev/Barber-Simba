@@ -1,4 +1,4 @@
-import hero from '../assets/hero.png'
+import hero from '../assets/icons/perfil.png'
 import allander from '../assets/allander.png'
 
 export const barbeiros = [
