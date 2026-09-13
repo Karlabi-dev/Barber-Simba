@@ -1,18 +1,10 @@
-function ServiceCard({nome,descricao,preco,duracao,IconTesoura,IconRelogio,
-}) {
-  return (
-    <div className="service-card">
-      <div className="service-icon"><img src={IconTesoura} alt="Serviço" />
-      </div>
+import { Link } from 'react-router-dom'
+import clockIcon from '../assets/icons/relogio.png'
 
-      <div><h3>{nome}</h3><p>{descricao}</p><small><img src={IconRelogio} alt="" />{duracao} min</small></div>
-
-      <div className="service-info">
-        <strong>R$ {preco}</strong>
-        <button>Agendar</button>
-      </div>
-    </div>
-  );
+export default function ServiceCard({ nome, descricao, preco, duracao, icon }) {
+  return <article className="service-card">
+    <div className="service-icon"><img src={icon} alt="" /></div>
+    <div className="service-copy"><h3>{nome}</h3><p>{descricao}</p><span><img src={clockIcon} alt="" /> {duracao} min</span></div>
+    <div className="service-action"><strong>R$ {preco}</strong><Link to={`/agendamento?servico=${encodeURIComponent(nome)}`}>Agendar</Link></div>
+  </article>
 }
-
-export default ServiceCard;
