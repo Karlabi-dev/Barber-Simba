@@ -1,4 +1,6 @@
 const messages = {
+  'auth/expired-action-code': 'Este link expirou. Solicite um novo e-mail de recuperação.',
+  'auth/invalid-action-code': 'Este link é inválido ou já foi usado. Solicite um novo e-mail de recuperação.',
   'auth/profile-save-failed': 'Conta criada, mas não foi possível salvar o nome. Entre com o e-mail e senha cadastrados.',
   'auth/invalid-email': 'Informe um e-mail válido.',
   'auth/missing-password': 'Informe a senha.',

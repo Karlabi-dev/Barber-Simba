@@ -29,4 +29,15 @@
 .auth-dialog h2 { color:#e5c158; font-size:22px; }
 .auth-dialog p { font-size:16px; line-height:1.5; }
 .auth-dialog .auth-submit { margin-top:20px; width:100%; }
+.auth-recovery { padding-top:88px; }
+.auth-recovery .auth-heading { margin:54px 0 52px; gap:24px; }
+.auth-recovery .auth-heading h1 { font-size:21px; }
+.auth-recovery .auth-submit { font-size:20px; margin-top:12px; }
+.auth-recovery label { margin-bottom:24px; }
+.auth-reminder { display:flex; align-items:center; gap:12px; margin:32px auto 0; padding:18px 16px; width:90%; box-sizing:border-box; border:1px solid #bbdfd7; border-radius:16px; background:#effdf9; color:#218b87; }
+.auth-reminder img { width:18px; height:22px; object-fit:contain; }
+.auth-reminder p { margin:0; font-size:13px; line-height:1.6; }
+.auth-status { color:#9ca3af; font-size:14px; }
+.auth-retry { margin-top:16px; }
+@media(max-width:410px) { .auth-screen.auth-recovery { padding-top:56px; } .auth-recovery .auth-heading { margin:36px 0 40px; gap:20px; } .auth-recovery .auth-heading h1 { font-size:17px; } .auth-recovery .auth-heading a { width:32px; height:32px; flex-shrink:0; } .auth-recovery .auth-submit { font-size:16px; width:220px; } .auth-reminder { padding:16px 12px; } .auth-reminder p { font-size:11px; } }
 @media(max-width:410px) { .auth-screen { min-height:100svh; padding:72px 24px 100px; } .auth-login { padding-top:140px; } .auth-brand { transform:scale(.8); } .auth-subtitle { font-size:14px; margin-top:0; } .auth-login .auth-form { margin-top:56px; } .auth-form input { height:45px; font-size:14px; border-radius:12px; } .auth-submit { font-size:18px; min-height:46px; width:220px; } .auth-heading { margin:28px 0 36px; } .auth-register label { font-size:16px; margin-bottom:18px; } .auth-forgot, .auth-signup { font-size:12px; } .auth-track { bottom:50px; } }

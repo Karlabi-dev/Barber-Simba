@@ -3,6 +3,37 @@ import assert from 'node:assert/strict'
 import { createAuthService } from '../src/services/createAuthService.js'
 import { authErrorMessage } from '../src/services/authErrors.js'
 
+test('redefinição só conclui após confirmação do Firebase e preserva senha', async () => {
+  let finish
+  let completed = false
+  const service = createAuthService({ auth: {}, ready: Promise.resolve({error:null}), sdk: {
+    async verifyPasswordResetCode(auth, code) { assert.equal(code, 'valid'); return 'teste@example.com' },
+    async confirmPasswordReset(auth, code, password) {
+      assert.equal(code, 'valid'); assert.equal(password, ' nova senha ')
+      await new Promise(resolve => { finish = resolve })
+    },
+  } })
+  assert.equal(await service.verificarRedefinicao('valid'), 'teste@example.com')
+  const pending = service.redefinirSenha('valid', ' nova senha ').then(() => { completed = true })
+  await new Promise(resolve => setImmediate(resolve))
+  assert.equal(completed, false)
+  finish(); await pending
+  assert.equal(completed, true)
+})
+
+test('link expirado ou usado propaga erro sem sinalizar sucesso', async () => {
+  for (const code of ['auth/expired-action-code', 'auth/invalid-action-code']) {
+    const error = { code }
+    const service = createAuthService({ auth: {}, ready: Promise.resolve({error:null}), sdk: {
+      async verifyPasswordResetCode() { throw error },
+      async confirmPasswordReset() { throw error },
+    } })
+    await assert.rejects(service.verificarRedefinicao('bad'), e => e === error)
+    await assert.rejects(service.redefinirSenha('bad', '123456'), e => e === error)
+    assert.match(authErrorMessage(error), /Solicite um novo/)
+  }
+})
+
 test('cadastro espera persistência, limpa email e preserva senha', async () => {
   let resolveReady
   let called = false

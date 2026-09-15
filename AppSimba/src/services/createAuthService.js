@@ -34,6 +34,14 @@ export function createAuthService({ auth, ready, sdk }) {
       await ensureReady()
       await sdk.sendPasswordResetEmail(auth, email.trim())
     },
+    async verificarRedefinicao(code) {
+      await ensureReady()
+      return sdk.verifyPasswordResetCode(auth, code)
+    },
+    async redefinirSenha(code, senha) {
+      await ensureReady()
+      await sdk.confirmPasswordReset(auth, code, senha)
+    },
     observar(callback, onError) {
       return sdk.onAuthStateChanged(auth, callback, onError)
     },
