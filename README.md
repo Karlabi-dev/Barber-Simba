@@ -25,7 +25,13 @@ Interface web de uma barbearia, com catálogo de serviços, profissionais e flux
 - Tema escuro com destaques dourados e ações em vermelho.
 - Página provisória de perfil, identificada como demonstração.
 
-A Home ainda apresenta um agendamento ilustrativo. Não há consulta de disponibilidade real, autenticação, backend ou banco de dados.
+A Home ainda apresenta um agendamento ilustrativo. Não há consulta de disponibilidade real, backend ou banco de dados de agendamentos.
+
+## Firebase Authentication
+
+A base de cadastro por e-mail/senha, login, logout e observação da sessão está integrada ao React. As telas ainda serão criadas, e as rotas demonstrativas continuam públicas. Configuração: projeto Firebase `barber-simba`.
+
+Consulte o [guia de integração](AppSimba/FIREBASE_AUTH.md) para habilitar o provedor, conectar as futuras telas e entender a persistência de sessão. Os testes atuais simulam o SDK e não confirmam acesso ao Firebase real.
 
 ## Executar localmente
 
@@ -98,7 +104,8 @@ Em uma futura hospedagem, configure o fallback das rotas para `index.html`, pois
 - Fotos dos demais profissionais, banner e ícones originais.
 - Finalização visual conforme os recursos exportados do Figma.
 - Definição da tela de perfil.
-- Integrações de autenticação, disponibilidade, reservas e notificações, caso sejam incluídas no escopo futuro.
+- Telas de autenticação conectadas ao Firebase e teste real de cadastro/login/logout.
+- Integrações de disponibilidade, reservas e notificações, caso sejam incluídas no escopo futuro.
 
 As imagens provisórias não representam uma implementação visual definitiva. Nenhum WhatsApp ou e-mail é enviado pela aplicação.
 
