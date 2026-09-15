@@ -8,10 +8,18 @@ import BookingReview from './pages/BookingReview'
 import BookingSuccess from './pages/BookingSuccess'
 import Loading from './pages/Loading'
 import Profile from './pages/Profile'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 export default function App() {
   return <BrowserRouter><Routes>
-    <Route path="/" element={<Navigate to="/loading" replace />} />
+    <Route path="/" element={<Navigate to="/login" replace />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/cadastro" element={<Register />} />
+    <Route path="/esqueci-senha" element={<ForgotPassword />} />
+    <Route path="/atualizar-senha" element={<ResetPassword />} />
     <Route path="/loading" element={<Loading />} />
     <Route path="/home" element={<Home />} />
     <Route path="/perfil" element={<Profile />} />

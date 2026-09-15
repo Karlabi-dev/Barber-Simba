@@ -1,0 +1,43 @@
+.auth-screen { background:#0e0f10; color:#e5c158; width:min(100%,410px); min-height:947px; margin:0 auto; position:relative; box-sizing:border-box; padding:100px 32px 128px; font-family:Inter,Arial,sans-serif; }
+.auth-brand { width:200px; height:46px; margin:0 auto; background-image:url('./assets/auth-reference.png'); background-repeat:no-repeat; background-size:994px 910px; background-position:-140px -193px; }
+.auth-login { padding-top:200px; }
+.auth-subtitle { text-align:center; color:#9ca3af; margin:12px -10px 0; font-size:20px; }
+.auth-form { display:flex; flex-direction:column; }
+.auth-login .auth-form { margin-top:80px; }
+.auth-form input { display:block; width:100%; height:54px; background:#59010c; border:1px solid #73101c; border-radius:16px; color:#fff; text-align:center; padding:0 16px; font-size:16px; box-sizing:border-box; }
+.auth-form input::placeholder { color:#b4a5aa; opacity:1; }
+.auth-login input + input { margin-top:28px; }
+.auth-forgot, .auth-signup { color:#9ca3af; font-size:14px; }
+.auth-forgot { margin:8px 0 0; text-align:right; }
+.auth-form a, .auth-forgot button { color:#e5c158; }
+.auth-forgot button { padding:0; border:0; background:none; font-size:inherit; cursor:pointer; }
+.auth-submit { align-self:center; width:250px; max-width:100%; min-height:58px; border:0; border-radius:17px; background:#e5c158; color:#080909; font-size:24px; font-weight:700; cursor:pointer; padding:8px; }
+.auth-login .auth-submit { margin-top:60px; }
+.auth-signup { text-align:right; margin:18px 0 0; }
+.auth-track { position:absolute; bottom:85px; left:50%; transform:translateX(-50%); width:128px; height:4px; border-radius:8px; background:#242629; }
+.auth-track span { display:block; width:52px; height:4px; border-radius:8px; background:#e5c158; }
+.auth-heading { display:flex; gap:16px; align-items:center; margin:44px -16px 44px; }
+.auth-heading a { display:grid; place-items:center; width:40px; height:40px; border-radius:50%; background:#59010c; color:#e5c158; }
+.auth-heading h1 { font-size:22px; font-weight:700; margin:0; }
+.auth-register label { color:#9ca3af; font-size:20px; display:block; margin-bottom:22px; }
+.auth-register label input { margin-top:4px; }
+.auth-register .auth-submit { margin-top:14px; }
+.auth-error { color:#ffb4b4; font-size:14px; line-height:1.5; margin:14px 0 0; }
+.auth-submit:disabled, .auth-forgot button:disabled { opacity:.6; cursor:wait; }
+.auth-dialog { width:min(360px,calc(100% - 32px)); box-sizing:border-box; border:1px solid #e5c158; border-radius:20px; padding:28px; background:#18191b; color:#fff; text-align:center; }
+.auth-dialog::backdrop { background:#000b; }
+.auth-dialog h2 { color:#e5c158; font-size:22px; }
+.auth-dialog p { font-size:16px; line-height:1.5; }
+.auth-dialog .auth-submit { margin-top:20px; width:100%; }
+.auth-recovery { padding-top:88px; }
+.auth-recovery .auth-heading { margin:54px 0 52px; gap:24px; }
+.auth-recovery .auth-heading h1 { font-size:21px; }
+.auth-recovery .auth-submit { font-size:20px; margin-top:12px; }
+.auth-recovery label { margin-bottom:24px; }
+.auth-reminder { display:flex; align-items:center; gap:12px; margin:32px auto 0; padding:18px 16px; width:90%; box-sizing:border-box; border:1px solid #bbdfd7; border-radius:16px; background:#effdf9; color:#218b87; }
+.auth-reminder img { width:18px; height:22px; object-fit:contain; }
+.auth-reminder p { margin:0; font-size:13px; line-height:1.6; }
+.auth-status { color:#9ca3af; font-size:14px; }
+.auth-retry { margin-top:16px; }
+@media(max-width:410px) { .auth-screen.auth-recovery { padding-top:56px; } .auth-recovery .auth-heading { margin:36px 0 40px; gap:20px; } .auth-recovery .auth-heading h1 { font-size:17px; } .auth-recovery .auth-heading a { width:32px; height:32px; flex-shrink:0; } .auth-recovery .auth-submit { font-size:16px; width:220px; } .auth-reminder { padding:16px 12px; } .auth-reminder p { font-size:11px; } }
+@media(max-width:410px) { .auth-screen { min-height:100svh; padding:72px 24px 100px; } .auth-login { padding-top:140px; } .auth-brand { transform:scale(.8); } .auth-subtitle { font-size:14px; margin-top:0; } .auth-login .auth-form { margin-top:56px; } .auth-form input { height:45px; font-size:14px; border-radius:12px; } .auth-submit { font-size:18px; min-height:46px; width:220px; } .auth-heading { margin:28px 0 36px; } .auth-register label { font-size:16px; margin-bottom:18px; } .auth-forgot, .auth-signup { font-size:12px; } .auth-track { bottom:50px; } }
