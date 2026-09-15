@@ -37,5 +37,6 @@ export function AuthProvider({ children }) {
     cadastrar: authService.cadastrar,
     entrar: authService.entrar,
     sair: authService.sair,
+    recuperarSenha: authService.recuperarSenha,
   }}>{children}</AuthContext.Provider>
 }

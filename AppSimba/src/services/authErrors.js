@@ -1,4 +1,5 @@
 const messages = {
+  'auth/profile-save-failed': 'Conta criada, mas não foi possível salvar o nome. Entre com o e-mail e senha cadastrados.',
   'auth/invalid-email': 'Informe um e-mail válido.',
   'auth/missing-password': 'Informe a senha.',
   'auth/weak-password': 'A senha não atende aos requisitos do projeto Firebase.',

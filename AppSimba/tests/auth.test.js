@@ -10,6 +10,7 @@ test('cadastro espera persistência, limpa email e preserva senha', async () => 
   const user = { uid: 'test' }
   const ready = new Promise(resolve => { resolveReady = resolve })
   const service = createAuthService({ auth, ready, sdk: {
+    async signOut(instance) { assert.equal(instance, auth) },
     async createUserWithEmailAndPassword(instance, email, senha) {
       called = true
       assert.equal(instance, auth)
@@ -52,4 +53,27 @@ test('observador retorna função de limpeza do SDK', () => {
     onAuthStateChanged(auth, received) { assert.equal(received, callback); return cleanup },
   }})
   assert.equal(service.observar(callback), cleanup)
+})
+
+test('cadastro salva nome e termina sessão antes de retornar sucesso', async () => {
+  const calls = []
+  const user = { uid: 'new-user' }
+  const service = createAuthService({ auth: {}, ready: Promise.resolve({ error: null }), sdk: {
+    async createUserWithEmailAndPassword() { calls.push('create'); return { user } },
+    async updateProfile(received, profile) { assert.equal(received, user); assert.equal(profile.displayName, 'Luciano'); calls.push('profile') },
+    async signOut() { calls.push('logout') },
+  } })
+  assert.equal(await service.cadastrar('a@b.com', '123456', ' Luciano '), user)
+  assert.deepEqual(calls, ['create', 'profile', 'logout'])
+})
+
+test('falha ao salvar nome ainda encerra sessão e informa conta já criada', async () => {
+  let loggedOut = false
+  const service = createAuthService({ auth: {}, ready: Promise.resolve({ error: null }), sdk: {
+    async createUserWithEmailAndPassword() { return { user: {} } },
+    async updateProfile() { throw new Error('offline') },
+    async signOut() { loggedOut = true },
+  } })
+  await assert.rejects(service.cadastrar('a@b.com', '123456', 'Nome'), { code: 'auth/profile-save-failed' })
+  assert.equal(loggedOut, true)
 })

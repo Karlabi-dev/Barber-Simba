@@ -29,7 +29,7 @@ A Home ainda apresenta um agendamento ilustrativo. Não há consulta de disponib
 
 ## Firebase Authentication
 
-A base de cadastro por e-mail/senha, login, logout e observação da sessão está integrada ao React. As telas ainda serão criadas, e as rotas demonstrativas continuam públicas. Configuração: projeto Firebase `barber-simba`.
+A autenticação está integrada ao React com telas de login e cadastro, recuperação de senha e observação da sessão. O cadastro salva o nome, encerra a sessão e exibe um popup de sucesso; ao fechar o popup, retorna ao login. As demais rotas demonstrativas continuam públicas. Configuração: projeto Firebase `barber-simba`.
 
 Consulte o [guia de integração](AppSimba/FIREBASE_AUTH.md) para habilitar o provedor, conectar as futuras telas e entender a persistência de sessão. Os testes atuais simulam o SDK e não confirmam acesso ao Firebase real.
 
@@ -80,7 +80,9 @@ Execute dentro da pasta `AppSimba`.
 
 | Caminho | Tela |
 | --- | --- |
-| `/` | Redirecionamento para carregamento |
+| `/` | Redirecionamento para login |
+| `/login` | Login e recuperação de senha |
+| `/cadastro` | Cadastro e popup de confirmação |
 | `/loading` | Carregamento |
 | `/home` | Home |
 | `/profissionais` | Lista de profissionais |
@@ -104,7 +106,7 @@ Em uma futura hospedagem, configure o fallback das rotas para `index.html`, pois
 - Fotos dos demais profissionais, banner e ícones originais.
 - Finalização visual conforme os recursos exportados do Figma.
 - Definição da tela de perfil.
-- Telas de autenticação conectadas ao Firebase e teste real de cadastro/login/logout.
+- Teste real de cadastro/login e recuperação de senha pelo usuário.
 - Integrações de disponibilidade, reservas e notificações, caso sejam incluídas no escopo futuro.
 
 As imagens provisórias não representam uma implementação visual definitiva. Nenhum WhatsApp ou e-mail é enviado pela aplicação.
