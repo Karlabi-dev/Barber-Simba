@@ -6,7 +6,16 @@
 .auth-login .auth-form { margin-top:80px; }
 .auth-form input { display:block; width:100%; height:54px; background:#59010c; border:1px solid #73101c; border-radius:16px; color:#fff; text-align:center; padding:0 16px; font-size:16px; box-sizing:border-box; }
 .auth-form input::placeholder { color:#b4a5aa; opacity:1; }
-.auth-login input + input { margin-top:28px; }
+.auth-login input + input, .auth-login input + .password-field { margin-top:28px; }
+.password-control { position:relative; }
+.auth-form .password-control input { padding-inline:48px; margin-top:0; }
+.auth-form .password-field-labeled { margin-bottom:22px; }
+.auth-form .password-field > label { margin-bottom:4px; }
+.password-toggle { position:absolute; right:4px; top:50%; transform:translateY(-50%); display:grid; place-items:center; width:44px; height:44px; padding:10px; border:0; border-radius:10px; background:transparent; color:#fff; cursor:pointer; }
+.password-toggle svg { width:22px; height:22px; }
+.password-toggle:focus-visible { outline:2px solid #e5c158; outline-offset:-3px; }
+.password-toggle:disabled { opacity:.5; cursor:default; }
+.password-control input::-ms-reveal { display:none; }
 .auth-forgot, .auth-signup { color:#9ca3af; font-size:14px; }
 .auth-forgot { margin:8px 0 0; text-align:center; }
 .auth-form a, .auth-forgot button { color:#e5c158; }

@@ -1,3 +1,4 @@
+import PasswordInput from '../components/PasswordInput'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
@@ -50,8 +51,8 @@ function ResetForm({ code, mode }) {
   return <AuthLayout recovery>
     <header className="auth-heading"><Link to="/login" aria-label="Voltar ao login">←</Link><h1>ATUALIZAR SENHA</h1></header>
     <form className="auth-form" onSubmit={submit}>
-      <label>Insira a nova senha<input type="password" autoComplete="new-password" placeholder="******" minLength={6} required value={senha} onChange={e => setSenha(e.target.value)} disabled={disabled} /></label>
-      <label>Repita a nova senha<input type="password" autoComplete="new-password" placeholder="******" minLength={6} required value={confirmar} onChange={e => setConfirmar(e.target.value)} disabled={disabled} /></label>
+      <PasswordInput label="Insira a nova senha" autoComplete="new-password" placeholder="******" minLength={6} required value={senha} onChange={e => setSenha(e.target.value)} disabled={disabled} />
+      <PasswordInput label="Repita a nova senha" autoComplete="new-password" placeholder="******" minLength={6} required value={confirmar} onChange={e => setConfirmar(e.target.value)} disabled={disabled} />
       {status === 'checking' && <p className="auth-status" role="status">Verificando link...</p>}
       {error && <p className="auth-error" role="alert">{error}</p>}
       {status === 'invalid' && <Link className="auth-retry" to="/esqueci-senha">Solicitar novo link</Link>}

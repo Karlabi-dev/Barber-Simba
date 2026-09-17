@@ -1,3 +1,4 @@
+import PasswordInput from '../components/PasswordInput'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -23,7 +24,7 @@ export default function Login() {
     <p className="auth-subtitle">Sistema Moderno de Barbearia</p>
     <form className="auth-form" onSubmit={submit}>
       <input aria-label="Email" type="email" autoComplete="username" placeholder="Simba@gmail.com" value={email} onChange={e => setEmail(e.target.value)} required disabled={busy} />
-      <input aria-label="Senha" type="password" autoComplete="current-password" placeholder="******" value={senha} onChange={e => setSenha(e.target.value)} required disabled={busy} />
+      <PasswordInput aria-label="Senha" autoComplete="current-password" placeholder="******" value={senha} onChange={e => setSenha(e.target.value)} required disabled={busy} />
       <p className="auth-forgot">Esqueceu a senha? <Link to="/esqueci-senha">Clique aqui</Link></p>
       {(error || erroSessao) && <p className="auth-error" role="alert">{error || erroSessao}</p>}
       <button className="auth-submit" type="submit" disabled={busy || carregando || !!erroSessao}>{busy ? 'Aguarde...' : 'Entrar'}</button>

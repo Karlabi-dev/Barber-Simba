@@ -1,3 +1,4 @@
+import PasswordInput from '../components/PasswordInput'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -32,8 +33,8 @@ export default function Register() {
     <form className="auth-form" onSubmit={submit}>
       <label>Nome<input autoComplete="name" placeholder="Nome" maxLength={100} value={nome} onChange={e => setNome(e.target.value)} required disabled={busy || success} /></label>
       <label>Email<input type="email" autoComplete="email" placeholder="Simba@gmail.com" value={email} onChange={e => setEmail(e.target.value)} required disabled={busy || success} /></label>
-      <label>Senha<input type="password" autoComplete="new-password" placeholder="******" minLength={6} value={senha} onChange={e => setSenha(e.target.value)} required disabled={busy || success} /></label>
-      <label>Confirmar senha<input type="password" autoComplete="new-password" placeholder="******" minLength={6} value={confirmar} onChange={e => setConfirmar(e.target.value)} required disabled={busy || success} /></label>
+      <PasswordInput label="Senha" autoComplete="new-password" placeholder="******" minLength={6} value={senha} onChange={e => setSenha(e.target.value)} required disabled={busy || success} />
+      <PasswordInput label="Confirmar senha" autoComplete="new-password" placeholder="******" minLength={6} value={confirmar} onChange={e => setConfirmar(e.target.value)} required disabled={busy || success} />
       {(error || erroSessao) && <p role="alert" className="auth-error">{error || erroSessao}</p>}
       <button className="auth-submit" type="submit" disabled={busy || success || carregando || !!erroSessao}>{busy ? 'Cadastrando...' : 'Confirmar cadastro'}</button>
     </form>
