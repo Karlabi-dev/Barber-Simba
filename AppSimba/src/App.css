@@ -76,7 +76,7 @@
 .appointment-card, .barber-card, .service-card { color: #fafdfd; background: #18191b; border-color: #292a2b; box-shadow: 0 5px 15px #0004; }
 .appointment-person em { color: #7fe0a6; background: #153b26; }
 .navbar { color: #fafdfd; background: #920014; border: 0; box-shadow: 0 8px 25px #0006; }
-.navbar a { color: #d6cccb; }.navbar .active { color: var(--gold); }.navbar .active img { filter: sepia(1) saturate(2); }
+.navbar a { color: #d6cccb; }.navbar .active { color: var(--gold); }.navbar img, .navbar .active img { filter: brightness(0) invert(1); opacity: 1; }
 .search { color: #fafdfd; background: #920014; border-color: #73000e; }.search input { color: #fafdfd; }.search input::placeholder { color: #d6cccb; }
 .small-button { color: #121314; background: var(--gold); font-weight: 700; }.service-action a { color: #fff; background: #920014; }
 .service-icon, .selected-service > span { background: #292a2b; }

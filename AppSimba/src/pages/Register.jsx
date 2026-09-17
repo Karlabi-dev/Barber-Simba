@@ -30,7 +30,7 @@ export default function Register() {
   return <AuthLayout cadastro>
     <header className="auth-heading"><Link to="/login" aria-label="Voltar ao login">←</Link><h1>Cadastro</h1></header>
     <form className="auth-form" onSubmit={submit}>
-      <label>Nome<input autoComplete="name" placeholder="Simba barbearia moderna" maxLength={100} value={nome} onChange={e => setNome(e.target.value)} required disabled={busy || success} /></label>
+      <label>Nome<input autoComplete="name" placeholder="Nome" maxLength={100} value={nome} onChange={e => setNome(e.target.value)} required disabled={busy || success} /></label>
       <label>Email<input type="email" autoComplete="email" placeholder="Simba@gmail.com" value={email} onChange={e => setEmail(e.target.value)} required disabled={busy || success} /></label>
       <label>Senha<input type="password" autoComplete="new-password" placeholder="******" minLength={6} value={senha} onChange={e => setSenha(e.target.value)} required disabled={busy || success} /></label>
       <label>Confirmar senha<input type="password" autoComplete="new-password" placeholder="******" minLength={6} value={confirmar} onChange={e => setConfirmar(e.target.value)} required disabled={busy || success} /></label>
