@@ -1,0 +1,17 @@
+.notifications-heading { display:flex; align-items:center; gap:12px; margin:28px 12px 30px; color:#e5c158; }
+.notifications-heading > a { width:36px; height:36px; display:grid; place-items:center; border-radius:50%; border:1px solid #292b2c; background:#18191b; font-size:25px; }
+.notifications-heading h1 { font-size:20px; margin:0; }
+.notifications-read { display:block; margin:0 0 20px auto; background:none; border:0; color:#e5c158; font-size:12px; cursor:pointer; }
+.notification-group { margin-bottom:30px; }
+.notification-group h2 { font-size:17px; margin:0 8px 10px; }
+.notification-card { display:flex; gap:12px; align-items:center; padding:13px 12px; margin-bottom:8px; border:1px solid #27282b; border-radius:18px; background:#18191b; }
+.notification-card.unread { border-left:3px solid #e5c158; }
+.notification-symbol { width:46px; height:46px; display:grid; place-items:center; flex-shrink:0; border-radius:50%; color:#59010c; background:#e5c158; }
+.notification-symbol.cancelled { background:#59010c; color:#e5c158; }
+.notification-card h3 { font-size:13px; margin:0 0 5px; }
+.notification-card p { color:#9ca3af; font-size:12px; line-height:1.5; margin:0 0 4px; }
+.notification-card time { color:#e5c158; font-size:11px; }
+.notifications-empty { color:#9ca3af; text-align:center; line-height:1.6; margin:48px 16px; }
+.notifications-bell { position:relative; display:grid; place-items:center; width:40px; height:40px; color:#9ca3af; }
+.notifications-badge { position:absolute; right:0; top:0; min-width:17px; height:17px; padding:0 4px; display:grid; place-items:center; border-radius:10px; background:#e5c158; color:#111; font-size:10px; font-weight:700; }
+.notifications-screen a:focus-visible, .notifications-screen button:focus-visible, .notifications-bell:focus-visible { outline:2px solid #e5c158; outline-offset:3px; }

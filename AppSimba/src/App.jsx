@@ -1,9 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
+import Notifications from './pages/Notifications'
 import Professionals from './pages/Professionals'
 import Services from './pages/Services'
 import Booking from './pages/Booking'
+import BookingHistory from './pages/BookingHistory'
 import BookingReview from './pages/BookingReview'
 import BookingSuccess from './pages/BookingSuccess'
 import Loading from './pages/Loading'
@@ -21,10 +23,12 @@ export default function App() {
     <Route path="/esqueci-senha" element={<ForgotPassword />} />
     <Route path="/atualizar-senha" element={<ResetPassword />} />
     <Route path="/loading" element={<Loading />} />
+    <Route path="/notificacoes" element={<Notifications />} />
     <Route path="/home" element={<Home />} />
     <Route path="/perfil" element={<Profile />} />
     <Route path="/profissionais" element={<Professionals />} />
     <Route path="/servicos" element={<Services />} />
+    <Route path="/agendas" element={<BookingHistory />} />
     <Route path="/agendamento" element={<Booking />} />
     <Route path="/confirmar-agendamento" element={<BookingReview />} />
     <Route path="/agendamento-confirmado" element={<BookingSuccess />} />
