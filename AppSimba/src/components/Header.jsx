@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom'
-import profileIcon from '../assets/icons/perfil.png'
+import NotificationBell from './NotificationBell'
+import { useNotifications } from '../hooks/useNotifications'
+import '../pages/Notifications.css'
 
 export default function Header({ title, backTo, compact = false }) {
+  const notifications = useNotifications()
+  const unread = notifications.filter(item => !item.read).length
   if (compact) return <header className="page-header">
     <Link className="icon-button" to={backTo || '/home'} aria-label="Voltar">←</Link>
     <h1>{title}</h1><span className="header-spacer" />
@@ -9,6 +13,6 @@ export default function Header({ title, backTo, compact = false }) {
 
   return <header className="brand-header">
     <Link className="brand" to="/home">SIMBA</Link>
-    <Link className="profile-button" to="/perfil" aria-label="Abrir perfil"><img src={profileIcon} alt="" /></Link>
+    <Link className="notifications-bell" to="/notificacoes" aria-label={`Notificações, ${unread} não lidas`}><NotificationBell />{unread > 0 && <span className="notifications-badge">{unread > 99 ? "99+" : unread}</span>}</Link>
   </header>
 }
