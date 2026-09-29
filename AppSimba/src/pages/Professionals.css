@@ -1,0 +1,42 @@
+.professionals-screen .page-header h1 { color:#e5c158; font-size:20px; }
+.professionals-tabs { display:flex; justify-content:center; gap:8px; margin:12px 0 18px; }
+.professionals-tabs button { border:1px solid #292b2e; border-radius:24px; padding:9px 13px; background:#18191b; color:#aab0ba; font-size:12px; cursor:pointer; }
+.professionals-tabs button[aria-pressed="true"] { background:#e5c158; border-color:#e5c158; color:#111; }
+.professional-filters { display:grid; gap:12px; margin-bottom:20px; padding:16px; border:1px solid #303035; border-radius:16px; background:#18191b; }
+.professional-filters label { display:grid; gap:6px; font-size:13px; color:#aaaeb6; }
+.professional-filters select { width:100%; background:#0e0f10; border:1px solid #444; padding:10px; border-radius:8px; color:#fff; }
+.professional-filters > button { background:none; border:0; color:#e5c158; cursor:pointer; padding:8px; }
+.professionals-results { display:grid; gap:12px; }
+.professional-row { display:flex; gap:10px; align-items:center; padding:14px 12px; border-radius:20px; background:#18191b; border:1px solid #242629; }
+.professional-row > img { width:48px; height:48px; flex-shrink:0; border-radius:50%; object-fit:cover; border:1px solid #e5c158; }
+.professional-info { flex:1; min-width:0; }
+.professional-info h2 { margin:0; font-size:13px; line-height:1.6; }
+.professional-info p { margin:3px 0; color:#9ca3af; font-size:11px; }
+.professional-info small { color:#e5c158; font-size:10px; }
+.professional-rating { color:#e5c158; white-space:nowrap; font-size:11px; }
+.professional-completed { color:#73b468; font-size:9px; }
+.professional-action { display:block; background:transparent; border:1px solid #295c30; color:#80c374; border-radius:5px; font-size:9px; padding:5px 7px; cursor:pointer; text-align:center; }
+.professional-actions { display:grid; gap:8px; }
+.review-action { color:#e5c158; border-color:#a37c18; }
+.professional-rated { color:#aeb2b9; background:#272a2e; font-size:8px; padding:5px; border-radius:4px; text-align:center; }
+.professionals-empty { color:#9ca3af; text-align:center; padding:24px 12px; font-size:14px; line-height:1.6; }
+.review-feedback { color:#e5c158; font-size:14px; }
+.review-sheet { position:fixed; inset:auto 0 0; width:min(100%,410px); max-width:100%; max-height:85svh; margin:0 auto; border:1px solid #292b2e; border-radius:24px 24px 0 0; padding:20px 18px 32px; background:#18191b; color:#fff; text-align:center; }
+.review-sheet::backdrop { background:#0008; }
+.review-sheet img { width:54px; height:54px; object-fit:cover; border-radius:50%; border:1px solid #e5c158; }
+.review-sheet h2 { margin:10px 0 6px; font-size:22px; }
+.review-sheet p { font-size:12px; color:#aab0ba; }
+.review-close { position:absolute; right:12px; top:10px; border:0; background:none; color:#aaa; font-size:26px; cursor:pointer; width:40px; height:40px; }
+.review-stars { display:flex; justify-content:center; margin:22px 0; }
+.review-stars button { flex:1; min-width:0; padding:0; border:0; background:none; color:#ffbb00; font-size:48px; cursor:pointer; }
+.review-submit { width:100%; background:#e5c158; color:#111; font-weight:700; border:0; border-radius:12px; padding:16px; cursor:pointer; }
+.review-submit:disabled { opacity:.5; cursor:default; }
+.professionals-screen button:focus-visible, .professionals-screen a:focus-visible { outline:2px solid #e5c158; outline-offset:3px; }
+.navbar.navbar-five { grid-template-columns:repeat(5,minmax(0,1fr)); }
+.navbar.navbar-five .active .navbar-icon { stroke:#e5c158; }
+@media(max-width:360px) { .professional-row { gap:7px; padding:12px 8px; } .professional-row > img { width:38px; height:38px; } .professional-info h2 { font-size:11px; } .professional-action { font-size:8px; padding:5px; } }
+
+.review-demo { padding:14px; margin:16px 0; border:1px dashed #77632c; border-radius:14px; background:#18191b; font-size:12px; }
+.review-demo strong { color:#e5c158; }
+.review-demo p { color:#aab0ba; line-height:1.5; }
+.review-demo button { padding:10px 12px; border:1px solid #e5c158; border-radius:8px; color:#e5c158; background:transparent; cursor:pointer; }
