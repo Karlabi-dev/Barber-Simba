@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import Header from '../components/Header'
 import { barbeiros } from '../data/barbeiros'
-import { readBookingHistory, saveBooking } from '../data/booking'
-import { filterProfessionals, readReviews, saveReview } from '../data/reviews'
+import { saveBooking } from '../data/booking'
+import { filterProfessionals, readReviews, saveReview, readReviewBookings, createReviewDemo, removeReviewDemo } from '../data/reviews'
 import './Professionals.css'
 
 export default function Professionals() {
@@ -23,7 +23,16 @@ export default function Professionals() {
   const dialog = useRef(null)
   const navigate = useNavigate()
   const filtered = filterProfessionals(barbeiros, {search, service, day, rating})
-  const history = readBookingHistory().filter(item => item.status === 'concluido' && item.profissional.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) && (historyFilter === 'rated' ? !!reviews[item.id] : !reviews[item.id]))
+  const reviewBookings = readReviewBookings()
+  const hasDemo = reviewBookings.some(item => item.demo)
+  const history = reviewBookings.filter(item => item.status === 'concluido' && item.profissional.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) && (historyFilter === 'rated' ? !!reviews[item.id] : !reviews[item.id]))
+  function demoAction(remove = false) {
+    try {
+      if (remove) setReviews(removeReviewDemo())
+      else { createReviewDemo(); setReviews(readReviews()); setSearch(''); setHistoryFilter('pending') }
+      setMessage(remove ? 'Dados de teste removidos.' : 'Atendimento fictício criado. Clique em Avaliar para testar as estrelas.')
+    } catch { setMessage('Não foi possível atualizar os dados de teste neste navegador.') }
+  }
   function openReview(item) { setSelected(item); setStars(0); setError(''); dialog.current.showModal() }
   function submit(event) {
     event.preventDefault()
@@ -47,10 +56,11 @@ export default function Professionals() {
       </div>}
       <section className="professionals-results">{filtered.map(item => <article className="professional-row" key={item.nome}><img src={item.foto} alt="" /><div className="professional-info"><h2>{item.nome} <span className="professional-rating">★ {item.avaliacao}</span></h2><p>{item.especialidade}</p><small>{item.dias.split('/').join(', ')}</small></div><Link className="professional-action" to={`/agendamento?${new URLSearchParams({profissional:item.nome})}`}>AGENDAR</Link></article>)}{!filtered.length && <p className="professionals-empty" role="status">Nenhum profissional encontrado com esses filtros.</p>}</section>
     </> : <>
+      <aside className="review-demo"><strong>Teste de avaliação</strong><p>Atendimento fictício para experimentar o painel de estrelas.</p>{hasDemo ? <button onClick={() => demoAction(true)}>Remover dados de teste</button> : <button onClick={() => demoAction()}>Criar atendimento de teste</button>}</aside>
       <div className="professionals-tabs" role="group" aria-label="Filtrar avaliações"><button aria-pressed={historyFilter === 'pending'} onClick={() => setHistoryFilter('pending')}>Pendentes</button><button aria-pressed={historyFilter === 'rated'} onClick={() => setHistoryFilter('rated')}>Avaliados</button></div>
-      <section className="professionals-results">{history.map(item => { const barber = barbeiros.find(value => value.nome === item.profissional); return <article className="professional-row" key={item.id}>{barber && <img src={barber.foto} alt="" />}<div className="professional-info"><h2>{item.profissional} <span className="professional-completed">Concluído</span></h2><p>{item.servico}</p><small>{new Date(`${item.data}T12:00:00`).toLocaleDateString('pt-BR')} · {item.horario}</small></div><div className="professional-actions">{reviews[item.id] ? <span className="professional-rated">AVALIADO · {reviews[item.id].stars} ★</span> : <button className="professional-action review-action" onClick={() => openReview(item)}>AVALIAR</button>}<button className="professional-action" onClick={() => rebook(item)}>REAGENDAR</button></div></article> })}{!history.length && <p className="professionals-empty">{historyFilter === 'pending' ? 'Nenhum atendimento concluído pendente de avaliação.' : 'Nenhum atendimento avaliado.'}</p>}</section>
+      <section className="professionals-results">{history.map(item => { const barber = barbeiros.find(value => value.nome === item.profissional); return <article className="professional-row" key={item.id}>{barber && <img src={barber.foto} alt="" />}<div className="professional-info"><h2>{item.profissional} <span className="professional-completed">Concluído</span></h2><p>{item.servico}{item.demo && " · TESTE"}</p><small>{new Date(`${item.data}T12:00:00`).toLocaleDateString('pt-BR')} · {item.horario}</small></div><div className="professional-actions">{reviews[item.id] ? <span className="professional-rated">AVALIADO · {reviews[item.id].stars} ★</span> : <button className="professional-action review-action" onClick={() => openReview(item)}>AVALIAR</button>}{!item.demo && <button className="professional-action" onClick={() => rebook(item)}>REAGENDAR</button>}</div></article> })}{!history.length && <p className="professionals-empty">{historyFilter === 'pending' ? 'Nenhum atendimento concluído pendente de avaliação.' : 'Nenhum atendimento avaliado.'}</p>}</section>
     </>}
     {message && <p role="status" className="review-feedback">{message}</p>}
-    <dialog ref={dialog} className="review-sheet" aria-labelledby="review-title"><form onSubmit={submit}><button type="button" className="review-close" aria-label="Fechar avaliação" onClick={() => dialog.current.close()}>×</button>{person && <img src={person.foto} alt="" />}<h2 id="review-title">Avalie o profissional</h2><p>{selected?.profissional} · {selected?.servico}</p><div className="review-stars" role="group" aria-label="Nota de 1 a 5 estrelas">{[1,2,3,4,5].map(value => <button type="button" key={value} aria-label={`${value} ${value === 1 ? 'estrela' : 'estrelas'}`} aria-pressed={stars === value} onClick={() => setStars(value)}>{value <= stars ? '★' : '☆'}</button>)}</div>{error && <p role="alert">{error}</p>}<button className="review-submit" disabled={!stars}>ENVIAR AVALIAÇÃO</button></form></dialog>
+    <dialog ref={dialog} className="review-sheet" aria-labelledby="review-title"><form onSubmit={submit}><button type="button" className="review-close" aria-label="Fechar avaliação" onClick={() => dialog.current.close()}>×</button>{person && <img src={person.foto} alt="" />}<h2 id="review-title">Avalie o profissional</h2><p>{selected?.profissional} · {selected?.servico}{selected?.demo && " · TESTE"}</p><div className="review-stars" role="group" aria-label="Nota de 1 a 5 estrelas">{[1,2,3,4,5].map(value => <button type="button" key={value} aria-label={`${value} ${value === 1 ? 'estrela' : 'estrelas'}`} aria-pressed={stars === value} onClick={() => setStars(value)}>{value <= stars ? '★' : '☆'}</button>)}</div>{error && <p role="alert">{error}</p>}<button className="review-submit" disabled={!stars}>ENVIAR AVALIAÇÃO</button></form></dialog>
   </AppShell>
 }
