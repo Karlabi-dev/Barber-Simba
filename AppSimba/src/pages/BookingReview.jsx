@@ -2,7 +2,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import Header from '../components/Header'
 import Button from '../components/Button'
-import { readBooking, saveBooking } from '../data/booking'
+import { readBooking, confirmBooking } from '../data/booking'
 import { barbeiros } from '../data/barbeiros'
 import calendar from '../assets/icons/calendario.png'
 import location from '../assets/icons/localizador.png'
@@ -23,6 +23,6 @@ export default function BookingReview() {
       {draft.observacoes && <p>Observações: {draft.observacoes}</p>}
     </article>
     <div className="reminder"><img src={bell} alt="" /><p>Demonstração local: notificações por WhatsApp e e-mail ainda não estão integradas.</p></div>
-    <div className="review-actions"><Button onClick={() => {saveBooking({...draft, confirmado:true}); navigate('/agendamento-confirmado')}}>Confirmar Agendamento</Button><Button variant="secondary" onClick={() => navigate('/agendamento')}>Editar Agendamento</Button></div>
+    <div className="review-actions"><Button onClick={() => {confirmBooking(draft); navigate('/agendamento-confirmado')}}>Confirmar Agendamento</Button><Button variant="secondary" onClick={() => navigate('/agendamento')}>Editar Agendamento</Button></div>
   </AppShell>
 }
