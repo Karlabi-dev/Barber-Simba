@@ -35,3 +35,8 @@
 .navbar.navbar-five { grid-template-columns:repeat(5,minmax(0,1fr)); }
 .navbar.navbar-five .active .navbar-icon { stroke:#e5c158; }
 @media(max-width:360px) { .professional-row { gap:7px; padding:12px 8px; } .professional-row > img { width:38px; height:38px; } .professional-info h2 { font-size:11px; } .professional-action { font-size:8px; padding:5px; } }
+
+.review-demo { padding:14px; margin:16px 0; border:1px dashed #77632c; border-radius:14px; background:#18191b; font-size:12px; }
+.review-demo strong { color:#e5c158; }
+.review-demo p { color:#aab0ba; line-height:1.5; }
+.review-demo button { padding:10px 12px; border:1px solid #e5c158; border-radius:8px; color:#e5c158; background:transparent; cursor:pointer; }
