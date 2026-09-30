@@ -10,7 +10,7 @@ test('agendamentos exigem token e vinculam criação, listagem e cancelamento ao
     if (sql.includes('INSERT INTO bookings')) return { rows: [booking] }
     if (sql.includes('UPDATE bookings')) return { rows: [{ id: booking.id }] }
     return { rows: [booking] }
-  }, async token => token === 'valid' ? { uid: 'firebase-user-1' } : null)
+  }, async token => token === 'valid' ? { uid: 'firebase-user-1', name: 'Cliente Teste' } : null)
   const server = app.listen(0)
   const base = `http://127.0.0.1:${server.address().port}`
   const auth = { Authorization: 'Bearer valid' }
@@ -31,6 +31,7 @@ test('agendamentos exigem token e vinculam criação, listagem e cancelamento ao
     assert.equal((await fetch(`${base}/api/bookings/${booking.id}/cancel`, { method: 'PATCH', headers: auth })).status, 200)
     assert.deepEqual(calls.map(({ params }) => params[0]), ['firebase-user-1', 'firebase-user-1', booking.id])
     assert.equal(calls[2].params[1], 'firebase-user-1')
+    assert.equal(calls[0].params[6], 'Cliente Teste')
   } finally { await new Promise(resolve => server.close(resolve)) }
 })
 

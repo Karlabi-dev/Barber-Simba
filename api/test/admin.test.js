@@ -18,7 +18,7 @@ test('todas as rotas administrativas exigem token e claim admin booleana', async
   const calls = []
   const { base, close } = await serve(async sql => { calls.push(sql); return { rows: [] } })
   try {
-    const paths = ['/api/admin/bookings', '/api/admin/services', '/api/admin/professionals']
+    const paths = ['/api/admin/bookings', '/api/admin/services', '/api/admin/professionals', '/api/admin/dashboard']
     for (const path of paths) {
       assert.equal((await fetch(base + path)).status, 401)
       assert.equal((await fetch(base + path, { headers: headers('user') })).status, 403)
@@ -30,7 +30,35 @@ test('todas as rotas administrativas exigem token e claim admin booleana', async
   } finally { await close() }
 })
 
-test('admin consulta agendamentos por status e só encerra agendamento confirmado', async () => {
+test('painel resume o dia de Fortaleza e filtra agenda sem aceitar período arbitrário', async () => {
+  const calls = []
+  const { base, close } = await serve(async (sql, params) => {
+    calls.push({ sql, params })
+    return sql.includes('count(*) AS "totalHoje"')
+      ? { rows: [{ totalHoje: '4', aguardandoHoje: '2', emAtendimentoHoje: '1', concluidosHoje: '1' }] }
+      : { rows: [{ id, status: 'confirmado' }] }
+  })
+  try {
+    const dashboard = await fetch(`${base}/api/admin/dashboard`, { headers: headers('admin') })
+    assert.equal(dashboard.status, 200)
+    assert.deepEqual(await dashboard.json(), { totalHoje: 4, aguardandoHoje: 2, emAtendimentoHoje: 1, concluidosHoje: 1 })
+    assert.match(calls[0].sql, /America\/Fortaleza/)
+
+    const today = await fetch(`${base}/api/admin/bookings?period=today`, { headers: headers('admin') })
+    assert.equal(today.status, 200)
+    assert.match(calls[1].sql, /America\/Fortaleza/)
+    assert.match(calls[1].sql, /ORDER BY b.starts_at ASC/)
+
+    const upcoming = await fetch(`${base}/api/admin/bookings?period=upcoming&status=confirmado`, { headers: headers('admin') })
+    assert.equal(upcoming.status, 200)
+    assert.deepEqual(calls[2].params, ['confirmado', 0])
+    assert.match(calls[2].sql, /b.starts_at >= now\(\)/)
+    assert.equal((await fetch(`${base}/api/admin/bookings?period=tomorrow`, { headers: headers('admin') })).status, 400)
+    assert.equal(calls.length, 3)
+  } finally { await close() }
+})
+
+test('admin inicia, conclui ou cancela somente no estado permitido', async () => {
   const calls = []
   const { base, close } = await serve(async (sql, params) => {
     calls.push({ sql, params })
@@ -46,12 +74,51 @@ test('admin consulta agendamentos por status e só encerra agendamento confirmad
     assert.equal((await fetch(`${base}/api/admin/bookings/${id}/status`, {
       method: 'PATCH', headers: headers('admin'), body: JSON.stringify({ status: 'confirmado' })
     })).status, 400)
+    const started = await fetch(`${base}/api/admin/bookings/${id}/status`, {
+      method: 'PATCH', headers: headers('admin'), body: JSON.stringify({ status: 'em_atendimento' })
+    })
+    assert.equal(started.status, 200)
+    assert.deepEqual(calls[1].params, [id, 'em_atendimento', 'confirmado'])
     const updated = await fetch(`${base}/api/admin/bookings/${id}/status`, {
       method: 'PATCH', headers: headers('admin'), body: JSON.stringify({ status: 'concluido' })
     })
     assert.equal(updated.status, 200)
-    assert.deepEqual(calls[1].params, [id, 'concluido'])
-    assert.match(calls[1].sql, /status = 'confirmado'/)
+    assert.deepEqual(calls[2].params, [id, 'concluido', 'em_atendimento'])
+    assert.match(calls[2].sql, /status = \$3/)
+  } finally { await close() }
+})
+
+test('transição concorrente retorna conflito e não altera o agendamento', async () => {
+  const { base, close } = await serve(async sql => ({ rows: sql.startsWith('UPDATE bookings') ? [] : [{ id }] }))
+  try {
+    const response = await fetch(`${base}/api/admin/bookings/${id}/status`, {
+      method: 'PATCH', headers: headers('admin'), body: JSON.stringify({ status: 'concluido' })
+    })
+    assert.equal(response.status, 409)
+    assert.match((await response.json()).error, /mudou de estado/)
+  } finally { await close() }
+})
+
+test('agenda filtra período local e detalhes exigem permissão administrativa', async () => {
+  const calls = []
+  const { base, close } = await serve(async (sql, params) => {
+    calls.push({ sql, params })
+    return { rows: [{ id, clienteNome: 'Cliente Teste', status: 'confirmado' }] }
+  })
+  try {
+    const range = `/api/admin/agenda?start=2026-09-28&end=2026-10-05&professionalId=${id}&offset=0`
+    assert.equal((await fetch(base + range, { headers: headers('user') })).status, 403)
+    assert.equal((await fetch(base + range, { headers: headers('admin') })).status, 200)
+    assert.deepEqual(calls[0].params, ['2026-09-28', '2026-10-05', id, null, 0])
+    assert.match(calls[0].sql, /AT TIME ZONE 'America\/Fortaleza'/)
+    assert.match(calls[0].sql, /b.professional_id = \$3/)
+    assert.equal((await fetch(`${base}/api/admin/agenda?start=2026-09-28&end=2026-11-05`, { headers: headers('admin') })).status, 400)
+    assert.equal((await fetch(`${base}/api/admin/agenda?start=2026-02-31&end=2026-03-02`, { headers: headers('admin') })).status, 400)
+    assert.equal((await fetch(`${base}/api/admin/bookings/${id}`, { headers: headers('user') })).status, 403)
+    const detail = await fetch(`${base}/api/admin/bookings/${id}`, { headers: headers('admin') })
+    assert.equal(detail.status, 200)
+    assert.equal((await detail.json()).clienteNome, 'Cliente Teste')
+    assert.deepEqual(calls[1].params, [id])
   } finally { await close() }
 })
 
@@ -77,5 +144,37 @@ test('catálogo valida entradas, usa parâmetros e permite desativação sem apa
     assert.equal((await fetch(`${base}/api/admin/professionals`, {
       method: 'POST', headers: headers('admin'), body: JSON.stringify({ slug: 'alguem', nome: 'Alguém' })
     })).status, 201)
+  } finally { await close() }
+})
+
+test('exclusão administrativa preserva cadastros ligados a agendamentos', async () => {
+  const calls = []
+  let outcome = 'deleted'
+  const { base, close } = await serve(async (sql, params) => {
+    calls.push({ sql, params })
+    if (outcome === 'booked') throw Object.assign(new Error('referenced'), { code: '23503' })
+    return { rows: outcome === 'missing' ? [] : [{ id }] }
+  })
+  try {
+    const service = `${base}/api/admin/services/${id}`
+    const professional = `${base}/api/admin/professionals/${id}`
+    assert.equal((await fetch(service, { method: 'DELETE', headers: headers('user') })).status, 403)
+    assert.equal((await fetch(`${base}/api/admin/services/invalido`, { method: 'DELETE', headers: headers('admin') })).status, 400)
+    assert.equal(calls.length, 0)
+
+    const removed = await fetch(service, { method: 'DELETE', headers: headers('admin') })
+    assert.equal(removed.status, 200)
+    assert.deepEqual(await removed.json(), { id, excluido: true })
+    assert.match(calls[0].sql, /^DELETE FROM services WHERE id = \$1 RETURNING id$/)
+    assert.deepEqual(calls[0].params, [id])
+
+    outcome = 'booked'
+    const blocked = await fetch(professional, { method: 'DELETE', headers: headers('admin') })
+    assert.equal(blocked.status, 409)
+    assert.match((await blocked.json()).error, /agendamentos.*Desative/)
+    assert.match(calls[1].sql, /^DELETE FROM professionals WHERE id = \$1 RETURNING id$/)
+
+    outcome = 'missing'
+    assert.equal((await fetch(professional, { method: 'DELETE', headers: headers('admin') })).status, 404)
   } finally { await close() }
 })

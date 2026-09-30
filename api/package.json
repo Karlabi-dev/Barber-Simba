@@ -7,6 +7,7 @@
     "start": "node src/server.js",
     "db:migrate": "node scripts/migrate.js",
     "admin:claim": "node scripts/admin-claim.js",
+    "admin:backfill-names": "node scripts/backfill-customer-names.js",
     "test": "node --test"
   },
   "dependencies": {

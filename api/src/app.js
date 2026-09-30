@@ -61,7 +61,7 @@ export function createApp(query = (sql, params) => getPool().query(sql, params),
       const occupied = await query(`SELECT
         EXTRACT(EPOCH FROM ((b.starts_at AT TIME ZONE 'America/Fortaleza') - $2::date::timestamp)) / 60 AS inicio,
         EXTRACT(EPOCH FROM ((b.ends_at AT TIME ZONE 'America/Fortaleza') - $2::date::timestamp)) / 60 AS fim
-        FROM bookings b WHERE b.professional_id = $1 AND b.status = 'confirmado'
+        FROM bookings b WHERE b.professional_id = $1 AND b.status IN ('confirmado', 'em_atendimento')
           AND b.starts_at < (($2::date + 1)::timestamp AT TIME ZONE 'America/Fortaleza')
           AND b.ends_at > ($2::date::timestamp AT TIME ZONE 'America/Fortaleza')`,
       [rows[0].professionalId, data])
@@ -92,10 +92,10 @@ export function createApp(query = (sql, params) => getPool().query(sql, params),
     }
     try {
       const { rows } = await query(`WITH created AS (
-        INSERT INTO bookings (firebase_uid, service_id, professional_id, starts_at, ends_at, observacoes)
+        INSERT INTO bookings (firebase_uid, service_id, professional_id, starts_at, ends_at, observacoes, customer_name)
         SELECT $1, s.id, p.id,
           ($4::date + $5::time) AT TIME ZONE 'America/Fortaleza',
-          (($4::date + $5::time) AT TIME ZONE 'America/Fortaleza') + s.duracao * interval '1 minute', $6
+          (($4::date + $5::time) AT TIME ZONE 'America/Fortaleza') + s.duracao * interval '1 minute', $6, $7
         FROM services s CROSS JOIN professionals p
         JOIN professional_hours ph ON ph.professional_id = p.id
           AND ph.weekday = EXTRACT(ISODOW FROM $4::date)
@@ -107,7 +107,8 @@ export function createApp(query = (sql, params) => getPool().query(sql, params),
       ) SELECT ${bookingFields} FROM created b
         JOIN services s ON s.id = b.service_id
         JOIN professionals p ON p.id = b.professional_id`,
-      [request.uid, serviceSlug, professionalSlug, data, horario, observacoes])
+      [request.uid, serviceSlug, professionalSlug, data, horario, observacoes,
+        typeof request.claims.name === 'string' ? request.claims.name.trim().slice(0, 120) : ''])
       if (!rows.length) return response.status(400).json({ error: 'Serviço, profissional ou horário indisponível.' })
       response.status(201).json(rows[0])
     } catch (error) {
