@@ -4,6 +4,8 @@
 .admin-mark { color: #e5c158; font-size: 25px; line-height: 1; }
 .admin-header h1 { margin: 0; color: #e5c158; font-size: 16px; font-weight: 700; flex: 1; }
 .admin-signout { border: 1px solid #4c3c22; border-radius: 20px; background: #202123; color: #e5c158; padding: 8px 12px; font-size: 11px; cursor: pointer; }
+.admin-back { width: 26px; height: 26px; border-radius: 50%; background: #202123; color: #e5c158; display: grid; place-items: center; font-size: 25px; line-height: 1; }
+.admin-add { width: 32px; height: 32px; border: 0; border-radius: 50%; background: #e5c158; color: #111; font-size: 21px; cursor: pointer; }
 .admin-overview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
 .admin-overview > div { min-width: 0; min-height: 81px; padding: 10px 8px; border: 1px solid #242526; border-radius: 10px; background: #18191b; display: flex; flex-direction: column; }
 .admin-overview span { color: #aaa; font-size: 9px; }
@@ -27,6 +29,9 @@
 .admin-error { color: #ffb8b8; }
 .admin-error button { border: 0; background: none; color: #e5c158; text-decoration: underline; cursor: pointer; }
 .admin-more { display: block; margin: 18px auto; background: #18191b; border: 1px solid #e5c158; color: #e5c158; border-radius: 10px; padding: 10px 20px; cursor: pointer; }
-.admin-footer { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: min(calc(100% - 28px), 382px); min-height: 54px; border-radius: 16px; background: #59010c; display: flex; justify-content: space-around; align-items: center; color: #e5c158; font-size: 10px; }
+.admin-footer { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: min(calc(100% - 28px), 382px); min-height: 58px; border-radius: 16px; background: #59010c; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; font-size: 10px; }
+.admin-footer a { display: grid; justify-items: center; gap: 2px; color: #d6cccb; }
+.admin-footer a > svg { width: 20px; height: 20px; }
+.admin-footer a.active { color: #e5c158; font-weight: 700; }
 .route-loading { min-height: 100svh; display: grid; place-content: center; gap: 14px; text-align: center; padding: 30px; color: #e5c158; background: #0e0f10; }
 .route-loading button { background: #e5c158; border: 0; border-radius: 10px; padding: 12px 20px; cursor: pointer; }

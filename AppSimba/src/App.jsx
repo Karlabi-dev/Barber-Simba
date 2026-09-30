@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import Notifications from './pages/Notifications'
@@ -15,6 +15,8 @@ import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import AdminDashboard from './pages/AdminDashboard'
+import AdminServices from './pages/AdminServices'
+import { AdminTeam, AdminProfessionalForm } from './pages/AdminTeam'
 import { useAuth } from './hooks/useAuth'
 import { homeForRole } from './services/roles'
 
@@ -51,6 +53,11 @@ function ProfessionalLanding() {
   return <main className="route-loading"><h1>Área do profissional</h1><p>A agenda do profissional será configurada na próxima etapa.</p><button type="button" onClick={sair}>Sair</button></main>
 }
 
+function AdminProfessionalRoute() {
+  const { id } = useParams()
+  return <AdminProfessionalForm key={id} />
+}
+
 export default function App() {
   return <BrowserRouter><Routes>
     <Route path="/" element={<StartRoute />} />
@@ -69,6 +76,9 @@ export default function App() {
     <Route path="/confirmar-agendamento" element={<CustomerRoute><BookingReview /></CustomerRoute>} />
     <Route path="/agendamento-confirmado" element={<CustomerRoute><BookingSuccess /></CustomerRoute>} />
     <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
+    <Route path="/admin/servicos" element={<RoleRoute role="admin"><AdminServices /></RoleRoute>} />
+    <Route path="/admin/equipe" element={<RoleRoute role="admin"><AdminTeam /></RoleRoute>} />
+    <Route path="/admin/equipe/:id" element={<RoleRoute role="admin"><AdminProfessionalRoute /></RoleRoute>} />
     <Route path="/profissional" element={<RoleRoute role="profissional"><ProfessionalLanding /></RoleRoute>} />
     <Route path="*" element={<StartRoute />} />
   </Routes></BrowserRouter>

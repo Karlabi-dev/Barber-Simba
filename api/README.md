@@ -47,7 +47,7 @@ Não envie o arquivo `.env` nem a URL do banco ao GitHub. As migrações usam a 
 
 ## Painel e API administrativa
 
-O mesmo login do AppSimba abre `/admin` quando o token Firebase contém `admin: true`. O painel inicial mostra o resumo de hoje e os atendimentos de hoje, futuros e do histórico. Contas comuns seguem para `/home`. A área do profissional está reservada para uma etapa posterior; ela ainda não consulta uma agenda própria.
+O mesmo login do AppSimba abre `/admin` quando o token Firebase contém `admin: true`. O painel inicial mostra o resumo de hoje e os atendimentos de hoje, futuros e do histórico. As telas `/admin/servicos` e `/admin/equipe` permitem cadastrar, editar e desativar os registros, além de configurar os horários por dia de cada profissional. Contas comuns seguem para `/home`. O cadastro da equipe cria o perfil no catálogo, mas ainda não concede login de profissional; essa área está reservada para uma etapa posterior. Novas fotos também exigem uma solução de armazenamento, por isso o formulário usa o avatar padrão.
 
 Todas as rotas `/api/admin/*` exigem `Authorization: Bearer <Firebase ID token>` de uma conta cujo token tenha a **custom claim booleana `admin: true`**. Uma conta autenticada sem essa permissão recebe 403; sem token válido, recebe 401. A permissão é conferida pela API com Firebase Admin, não pelo navegador, e não existe rota HTTP para concedê-la.
 

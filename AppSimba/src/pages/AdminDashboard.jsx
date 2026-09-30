@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { loadAdminBookings, loadAdminDashboard } from '../services/admin'
+import AdminPage from '../components/AdminPage'
 import './AdminDashboard.css'
 
 const filters = [
@@ -17,7 +18,7 @@ function formatDate(value) {
 }
 
 export default function AdminDashboard() {
-  const { usuario, sair } = useAuth()
+  const { usuario } = useAuth()
   const [filter, setFilter] = useState('today')
   const [summary, setSummary] = useState(null)
   const [bookings, setBookings] = useState([])
@@ -65,14 +66,7 @@ export default function AdminDashboard() {
     finally { setLoadingMore(false) }
   }
 
-  return <main className="admin-shell">
-    <div className="admin-statusbar" aria-hidden="true"><strong>9:41</strong><span>▮▮▮ ))) ▰</span></div>
-    <header className="admin-header">
-      <span className="admin-mark" aria-hidden="true">♛</span>
-      <h1>PAINEL ADMIN</h1>
-      <button className="admin-signout" type="button" onClick={sair} aria-label="Sair da conta">Sair</button>
-    </header>
-
+  return <AdminPage title="PAINEL ADMIN">
     <section className="admin-overview" aria-label="Resumo de hoje">
       <div><span>Hoje</span><strong>{summary?.totalHoje ?? '—'}</strong><small>agendamentos</small></div>
       <div><span>Aguardando</span><strong>{summary?.aguardandoHoje ?? '—'}</strong><small>hoje</small></div>
@@ -100,6 +94,5 @@ export default function AdminDashboard() {
       </div>
       {hasMore && !loading && <button className="admin-more" type="button" onClick={more} disabled={loadingMore}>{loadingMore ? 'Carregando...' : 'Carregar mais'}</button>}
     </section>
-    <footer className="admin-footer"><span>Início</span><span>Área administrativa</span></footer>
-  </main>
+  </AdminPage>
 }
