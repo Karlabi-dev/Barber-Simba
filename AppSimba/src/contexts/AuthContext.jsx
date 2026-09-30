@@ -36,6 +36,9 @@ export function AuthProvider({ children }) {
     usuario, carregando, erroSessao,
     cadastrar: authService.cadastrar,
     entrar: authService.entrar,
+    atualizarPerfil: authService.atualizarPerfil,
+    alterarEmail: authService.alterarEmail,
+    alterarSenha: authService.alterarSenha,
     sair: authService.sair,
     recuperarSenha: authService.recuperarSenha,
   }}>{children}</AuthContext.Provider>
