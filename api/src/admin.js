@@ -1,11 +1,17 @@
 import { Router } from 'express'
-import { minutes, scheduleDays, validTime } from './availability.js'
+import { minutes, scheduleDays, validDate, validTime } from './availability.js'
 
 const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const shortText = value => typeof value === 'string' && value.trim().length > 0 && value.length <= 120
 const optionalText = (value, max) => typeof value === 'string' && value.length <= max
 const order = value => Number.isInteger(value) && value >= 0 && value <= 10000
+const adminBookingFields = `b.id, b.firebase_uid AS "firebaseUid", b.customer_name AS "clienteNome",
+  b.status, b.observacoes,
+  to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'YYYY-MM-DD') AS data,
+  to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'HH24:MI') AS horario,
+  s.nome AS servico, p.nome AS profissional,
+  b.service_id AS "serviceId", b.professional_id AS "professionalId"`
 const specs = {
   services: {
     required: ['slug', 'nome', 'categoria', 'preco', 'duracao'],
@@ -61,6 +67,7 @@ export function createAdminRouter(query) {
       const { rows } = await query(`SELECT
         count(*) AS "totalHoje",
         count(*) FILTER (WHERE status = 'confirmado') AS "aguardandoHoje",
+        count(*) FILTER (WHERE status = 'em_atendimento') AS "emAtendimentoHoje",
         count(*) FILTER (WHERE status = 'concluido') AS "concluidosHoje"
         FROM bookings
         WHERE (starts_at AT TIME ZONE 'America/Fortaleza')::date =
@@ -69,6 +76,7 @@ export function createAdminRouter(query) {
       response.json({
         totalHoje: Number(summary.totalHoje || 0),
         aguardandoHoje: Number(summary.aguardandoHoje || 0),
+        emAtendimentoHoje: Number(summary.emAtendimentoHoje || 0),
         concluidosHoje: Number(summary.concluidosHoje || 0),
       })
     } catch (error) { next(error) }
@@ -76,7 +84,7 @@ export function createAdminRouter(query) {
 
   router.get('/bookings', async (request, response, next) => {
     const { status, offset = '0', period } = request.query
-    if (status !== undefined && !['confirmado', 'concluido', 'cancelado'].includes(status))
+    if (status !== undefined && !['confirmado', 'em_atendimento', 'concluido', 'cancelado'].includes(status))
       return response.status(400).json({ error: 'Status inválido.' })
     if (period !== undefined && !['today', 'upcoming'].includes(period))
       return response.status(400).json({ error: 'Período inválido.' })
@@ -88,10 +96,7 @@ export function createAdminRouter(query) {
       : period === 'upcoming' ? 'AND b.starts_at >= now()' : ''
     const direction = period ? 'ASC' : 'DESC'
     try {
-      const { rows } = await query(`SELECT b.id, b.firebase_uid AS "firebaseUid", b.status, b.observacoes,
-        to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'YYYY-MM-DD') AS data,
-        to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'HH24:MI') AS horario,
-        s.nome AS servico, p.nome AS profissional
+      const { rows } = await query(`SELECT ${adminBookingFields}
         FROM bookings b JOIN services s ON s.id = b.service_id
         JOIN professionals p ON p.id = b.professional_id
         WHERE ($1::text IS NULL OR b.status = $1) ${periodClause}
@@ -100,14 +105,48 @@ export function createAdminRouter(query) {
     } catch (error) { next(error) }
   })
 
+  router.get('/agenda', async (request, response, next) => {
+    const { start, end, professionalId, serviceId, offset = '0' } = request.query
+    const days = Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)
+    if (!validDate(start) || !validDate(end) || days < 86400000 || days > 32 * 86400000 ||
+        (professionalId !== undefined && (typeof professionalId !== 'string' || !uuid.test(professionalId))) ||
+        (serviceId !== undefined && (typeof serviceId !== 'string' || !uuid.test(serviceId))) ||
+        typeof offset !== 'string' || !/^\d{1,6}$/.test(offset) || Number(offset) > 100000)
+      return response.status(400).json({ error: 'Confira período, filtros e paginação.' })
+    try {
+      const { rows } = await query(`SELECT ${adminBookingFields}
+        FROM bookings b JOIN services s ON s.id = b.service_id
+        JOIN professionals p ON p.id = b.professional_id
+        WHERE b.starts_at >= ($1::date::timestamp AT TIME ZONE 'America/Fortaleza')
+          AND b.starts_at < ($2::date::timestamp AT TIME ZONE 'America/Fortaleza')
+          AND ($3::uuid IS NULL OR b.professional_id = $3)
+          AND ($4::uuid IS NULL OR b.service_id = $4)
+        ORDER BY b.starts_at ASC, b.id ASC LIMIT 100 OFFSET $5`,
+      [start, end, professionalId ?? null, serviceId ?? null, Number(offset)])
+      response.json(rows)
+    } catch (error) { next(error) }
+  })
+
+  router.get('/bookings/:id', async (request, response, next) => {
+    if (!uuid.test(request.params.id)) return response.status(400).json({ error: 'Agendamento inválido.' })
+    try {
+      const { rows } = await query(`SELECT ${adminBookingFields}
+        FROM bookings b JOIN services s ON s.id = b.service_id
+        JOIN professionals p ON p.id = b.professional_id WHERE b.id = $1`, [request.params.id])
+      if (!rows.length) return response.status(404).json({ error: 'Agendamento não encontrado.' })
+      response.json(rows[0])
+    } catch (error) { next(error) }
+  })
+
   router.patch('/bookings/:id/status', async (request, response, next) => {
     const { status } = request.body || {}
-    if (!uuid.test(request.params.id) || !['concluido', 'cancelado'].includes(status) || Object.keys(request.body || {}).length !== 1)
+    const requiredPrevious = { em_atendimento: 'confirmado', concluido: 'em_atendimento', cancelado: 'confirmado' }
+    if (!uuid.test(request.params.id) || !Object.hasOwn(requiredPrevious, status) || Object.keys(request.body || {}).length !== 1)
       return response.status(400).json({ error: 'Agendamento ou status inválido.' })
     try {
       const { rows } = await query(`UPDATE bookings SET status = $2
-        WHERE id = $1 AND status = 'confirmado' RETURNING id, status`, [request.params.id, status])
-      if (!rows.length) return response.status(404).json({ error: 'Agendamento não encontrado ou já encerrado.' })
+        WHERE id = $1 AND status = $3 RETURNING id, status`, [request.params.id, status, requiredPrevious[status]])
+      if (!rows.length) return response.status(409).json({ error: 'O agendamento mudou de estado. Atualize a tela antes de continuar.' })
       response.json(rows[0])
     } catch (error) { next(error) }
   })

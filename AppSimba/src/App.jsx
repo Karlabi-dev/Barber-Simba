@@ -17,6 +17,8 @@ import ResetPassword from './pages/ResetPassword'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminServices from './pages/AdminServices'
 import { AdminTeam, AdminProfessionalForm } from './pages/AdminTeam'
+import AdminAgenda from './pages/AdminAgenda'
+import AdminBookingDetails from './pages/AdminBookingDetails'
 import { useAuth } from './hooks/useAuth'
 import { homeForRole } from './services/roles'
 
@@ -76,6 +78,8 @@ export default function App() {
     <Route path="/confirmar-agendamento" element={<CustomerRoute><BookingReview /></CustomerRoute>} />
     <Route path="/agendamento-confirmado" element={<CustomerRoute><BookingSuccess /></CustomerRoute>} />
     <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
+    <Route path="/admin/agenda" element={<RoleRoute role="admin"><AdminAgenda /></RoleRoute>} />
+    <Route path="/admin/agendamentos/:id" element={<RoleRoute role="admin"><AdminBookingDetails /></RoleRoute>} />
     <Route path="/admin/servicos" element={<RoleRoute role="admin"><AdminServices /></RoleRoute>} />
     <Route path="/admin/equipe" element={<RoleRoute role="admin"><AdminTeam /></RoleRoute>} />
     <Route path="/admin/equipe/:id" element={<RoleRoute role="admin"><AdminProfessionalRoute /></RoleRoute>} />

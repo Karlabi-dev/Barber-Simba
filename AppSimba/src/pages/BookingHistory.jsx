@@ -7,7 +7,8 @@ import { useAuth } from '../hooks/useAuth'
 import { barbeiros } from '../data/barbeiros'
 import './BookingHistory.css'
 
-const filters = [['todos', 'Todos'], ['confirmado', 'Confirmados'], ['concluido', 'Concluídos'], ['cancelado', 'Cancelados']]
+const filters = [['todos', 'Todos'], ['confirmado', 'Confirmados'], ['em_atendimento', 'Em atendimento'], ['concluido', 'Concluídos'], ['cancelado', 'Cancelados']]
+const statusName = { confirmado: 'Agendado', em_atendimento: 'Em atendimento', concluido: 'Concluído', cancelado: 'Cancelado' }
 export default function BookingHistory() {
   const useNeon = import.meta.env.VITE_USE_NEON === 'true'
   const { usuario, carregando } = useAuth()
@@ -53,10 +54,10 @@ export default function BookingHistory() {
         const date = new Date(`${item.data}T12:00:00`).toLocaleDateString('pt-BR', {day:'numeric', month:'short'})
         return <article className="history-card" key={item.id}>
           {barber && <img className="history-avatar" src={barber.foto} alt="" />}
-          <div className="history-details"><div className="history-name"><h3>{item.profissional}</h3><span className={`history-status ${item.status}`}>{item.status === 'concluido' ? 'Concluído' : item.status === 'cancelado' ? 'Cancelado' : 'Agendado'}</span></div>
+          <div className="history-details"><div className="history-name"><h3>{item.profissional}</h3><span className={`history-status ${item.status}`}>{statusName[item.status] || item.status}</span></div>
             <p>{item.servico}</p><time dateTime={`${item.data}T${item.horario}`}>{date} · {item.horario}</time>
           </div>
-          <div className="history-actions">{item.status === 'confirmado' ? <button type="button" onClick={() => cancel(item.id)}>CANCELAR</button> : <span className={item.status}>{item.status === 'concluido' ? 'FINALIZADO' : 'CANCELADO'}</span>}</div>
+          <div className="history-actions">{item.status === 'confirmado' ? <button type="button" onClick={() => cancel(item.id)}>CANCELAR</button> : <span className={item.status}>{item.status === 'concluido' ? 'FINALIZADO' : item.status === 'em_atendimento' ? 'EM ATENDIMENTO' : 'CANCELADO'}</span>}</div>
         </article>
       })}
       {!visible.length && !loading && !error && (!useNeon || usuario) && <div className="history-empty"><p>{filter === 'todos' ? 'Você ainda não tem agendamentos.' : 'Nenhum agendamento neste filtro.'}</p><Link to="/agendamento">Novo agendamento</Link></div>}

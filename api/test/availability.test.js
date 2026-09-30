@@ -44,6 +44,7 @@ test('disponibilidade pública consulta agenda e reservas; dia fechado retorna l
     assert.equal(result.horarios.at(-1), '17:30')
     assert.deepEqual(calls[1].params, [id, date])
     assert.match(calls[0].sql, /EXTRACT\(ISODOW/)
+    assert.match(calls[1].sql, /status IN \('confirmado', 'em_atendimento'\)/)
 
     closed = true
     assert.deepEqual((await (await fetch(`${base}/api/availability?${query}`)).json()).horarios, [])

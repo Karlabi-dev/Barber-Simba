@@ -19,8 +19,21 @@ export function loadAdminBookings(user, filter, offset = 0, signal) {
     params.set('period', 'upcoming')
     params.set('status', 'confirmado')
   }
+  if (filter === 'in_progress') params.set('status', 'em_atendimento')
   return adminRequest(user, `/bookings?${params}`, { signal })
 }
+
+export function loadAdminAgenda(user, { start, end, professionalId, serviceId, offset = 0 }, signal) {
+  const params = new URLSearchParams({ start, end, offset: String(offset) })
+  if (professionalId) params.set('professionalId', professionalId)
+  if (serviceId) params.set('serviceId', serviceId)
+  return adminRequest(user, `/agenda?${params}`, { signal })
+}
+
+export const loadAdminBooking = (user, id, signal) => adminRequest(user,
+  `/bookings/${encodeURIComponent(id)}`, { signal })
+export const setAdminBookingStatus = (user, id, status) => adminRequest(user,
+  `/bookings/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: { status } })
 
 export const loadAdminServices = (user, signal) => adminRequest(user, '/services', { signal })
 export const saveAdminService = (user, service, id) => adminRequest(user,

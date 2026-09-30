@@ -2,20 +2,15 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { loadAdminBookings, loadAdminDashboard } from '../services/admin'
 import AdminPage from '../components/AdminPage'
+import AdminBookingCard from '../components/AdminBookingCard'
 import './AdminDashboard.css'
 
 const filters = [
   ['today', 'Hoje'],
   ['upcoming', 'Próximos'],
+  ['in_progress', 'Em curso'],
   ['all', 'Ver todos'],
 ]
-
-const statusLabel = { confirmado: 'Agendado', concluido: 'Finalizado', cancelado: 'Cancelado' }
-
-function formatDate(value) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return value || ''
-  return new Date(`${value}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
-}
 
 export default function AdminDashboard() {
   const { usuario } = useAuth()
@@ -70,6 +65,7 @@ export default function AdminDashboard() {
     <section className="admin-overview" aria-label="Resumo de hoje">
       <div><span>Hoje</span><strong>{summary?.totalHoje ?? '—'}</strong><small>agendamentos</small></div>
       <div><span>Aguardando</span><strong>{summary?.aguardandoHoje ?? '—'}</strong><small>hoje</small></div>
+      <div><span>Em atendimento</span><strong>{summary?.emAtendimentoHoje ?? '—'}</strong><small>hoje</small></div>
       <div><span>Finalizados</span><strong>{summary?.concluidosHoje ?? '—'}</strong><small>hoje</small></div>
     </section>
 
@@ -82,15 +78,7 @@ export default function AdminDashboard() {
       {loading && <p className="admin-feedback" role="status">Carregando agendamentos...</p>}
       {!loading && !error && !bookings.length && <p className="admin-feedback">Nenhum atendimento neste período.</p>}
       <div className="admin-list">
-        {bookings.map(booking => <article className="admin-booking" key={booking.id}>
-          <div className="admin-booking-icon" aria-hidden="true">✂</div>
-          <div className="admin-booking-main">
-            <strong>{booking.servico}</strong>
-            <span>Profissional: {booking.profissional}</span>
-            <time dateTime={`${booking.data}T${booking.horario}`}>{formatDate(booking.data)} · {booking.horario}</time>
-          </div>
-          <span className={`admin-booking-status admin-booking-status-${booking.status}`}>{statusLabel[booking.status] || booking.status}</span>
-        </article>)}
+        {bookings.map(booking => <AdminBookingCard key={booking.id} booking={booking} />)}
       </div>
       {hasMore && !loading && <button className="admin-more" type="button" onClick={more} disabled={loadingMore}>{loadingMore ? 'Carregando...' : 'Carregar mais'}</button>}
     </section>

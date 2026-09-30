@@ -4,6 +4,7 @@ import '../pages/AdminDashboard.css'
 
 const links = [
   ['/admin', 'Início', <><path d="m3 10 9-7 9 7" /><path d="M5 9v12h5v-7h4v7h5V9" /></>],
+  ['/admin/agenda', 'Agenda', <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 3v4m10-4v4M3 11h18M7 15h2m2 0h2m2 0h2" /></>],
   ['/admin/servicos', 'Serviços', <><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><path d="m8.2 8.2 12.8 12.8M8.2 15.8 21 3" /></>],
   ['/admin/equipe', 'Equipe', <><circle cx="9" cy="7" r="3" /><path d="M3 21v-3a6 6 0 0 1 12 0v3m2-16a3 3 0 0 1 0 6m2 10v-3a6 6 0 0 0-2-4" /></>],
 ]

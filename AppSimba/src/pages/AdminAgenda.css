@@ -1,0 +1,28 @@
+.admin-agenda-period { display: flex; gap: 7px; align-items: end; }
+.admin-agenda-period > button { width: 34px; height: 42px; flex-shrink: 0; border: 1px solid #292a2b; border-radius: 10px; background: #18191b; color: #e5c158; font-size: 23px; cursor: pointer; }
+.admin-agenda-period label { display: grid; gap: 4px; flex: 1; color: #aaa; font-size: 10px; }
+.admin-agenda-period input, .admin-agenda-filters select { width: 100%; min-width: 0; min-height: 42px; padding: 8px; border: 1px solid #292a2b; border-radius: 10px; background: #18191b; color: #fafafa; }
+.admin-agenda-views { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 14px; }
+.admin-agenda-views button { min-height: 33px; border: 1px solid #292a2b; border-radius: 9px; background: #18191b; color: #aaa; font-size: 11px; cursor: pointer; }
+.admin-agenda-views button[aria-pressed='true'] { border-color: #e5c158; background: #e5c158; color: #111; font-weight: 700; }
+.admin-agenda-range { margin: 10px 3px 14px; color: #e5c158; font-size: 11px; line-height: 1.4; }
+.admin-agenda-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.admin-agenda-filters label { display: grid; gap: 5px; color: #aaa; font-size: 10px; }
+.admin-agenda-filters select { font-size: 10px; }
+.admin-agenda-back { display: inline-block; margin-bottom: 18px; color: #e5c158; font-size: 11px; }
+.admin-detail-card { display: grid; gap: 13px; padding: 18px; border: 1px solid #292a2b; border-radius: 16px; background: #18191b; }
+.admin-detail-card > strong { font-size: 15px; }
+.admin-detail-card > small { color: #aaa; font-size: 9px; overflow-wrap: anywhere; }
+.admin-detail-card div { display: grid; gap: 5px; padding-top: 11px; border-top: 1px solid #292a2b; }
+.admin-detail-card div span { color: #aaa; font-size: 9px; text-transform: uppercase; }
+.admin-detail-card div b { color: #fafafa; font-size: 11px; font-weight: 600; overflow-wrap: anywhere; }
+.admin-detail-status { margin-top: 19px; padding: 0 5px; }
+.admin-detail-status h2 { margin: 0 0 12px; font-size: 13px; }
+.admin-detail-status div { display: flex; align-items: center; gap: 9px; margin: 9px 0; color: #777; font-size: 11px; }
+.admin-detail-status div span { color: #424345; font-size: 12px; }
+.admin-detail-status div.reached, .admin-detail-status div.reached span { color: #e5c158; }
+.admin-detail-cancelled { color: #ff9a9a; font-size: 11px; }
+.admin-detail-actions { display: grid; gap: 9px; margin-top: 28px; }
+.admin-detail-actions button { min-height: 48px; border: 0; border-radius: 10px; background: #e5c158; color: #111; font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+.admin-detail-actions button.secondary { border: 1px solid #aa5959; background: #18191b; color: #ff9a9a; }
+.admin-detail-actions button:disabled { opacity: .6; cursor: wait; }
