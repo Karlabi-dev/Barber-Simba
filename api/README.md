@@ -1,7 +1,6 @@
 # API e banco do Simba
 
-Primeira etapa da integração: catálogo de serviços e profissionais no Postgres do Neon.
-Os agendamentos e avaliações do app ainda são dados de demonstração no navegador.
+Catálogo público e agendamentos no Postgres do Neon. A tela de avaliações e as notificações ainda são demonstrações locais.
 
 ## Configuração local
 
@@ -14,6 +13,14 @@ Os agendamentos e avaliações do app ainda são dados de demonstração no nave
 No Windows PowerShell, use `npm.cmd` em vez de `npm` se a execução de scripts estiver bloqueada.
 O Vite encaminha `/api` para `localhost:3001` no desenvolvimento. Em produção, o servidor que hospedar o frontend também precisa encaminhar `/api` à API.
 
-Sem `VITE_USE_NEON=true`, a tela de Serviços continua com os dados locais de demonstração. Com a opção ativa, ela exibe dados da API e mostra uma mensagem se a conexão falhar. As demais telas ainda usam os dados locais nesta etapa.
+Sem `VITE_USE_NEON=true`, o app mantém o modo de demonstração. Com a opção ativa, Serviços, Profissionais, Agendamento e Histórico consultam a API. Para agendar, o usuário precisa entrar com Firebase Authentication.
+
+## Agendamentos
+
+- `GET /api/bookings`: lista somente os agendamentos do usuário autenticado.
+- `POST /api/bookings`: recebe `serviceSlug`, `professionalSlug`, `data` (AAAA-MM-DD), `horario` (HH:MM) e `observacoes` opcional. Retorna 409 se o profissional já tiver reserva nesse horário.
+- `PATCH /api/bookings/:id/cancel`: cancela somente um agendamento confirmado do próprio usuário.
+
+As três rotas exigem `Authorization: Bearer <Firebase ID token>`. A API verifica assinatura, validade e projeto do token com Firebase Admin (`FIREBASE_PROJECT_ID=barber-simba`); nunca recebe uma senha do Firebase. O horário é interpretado em `America/Fortaleza`. Avaliações e notificações continuam locais e não representam mensagens efetivamente enviadas.
 
 Não envie o arquivo `.env` nem a URL do banco ao GitHub. As migrações usam a conexão direta do Neon; as consultas usam a URL agrupada.
