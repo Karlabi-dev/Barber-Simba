@@ -1,6 +1,7 @@
 import express from 'express'
 import { getPool } from './db.js'
-import { requireUser, verifyFirebaseToken } from './auth.js'
+import { requireAdmin, requireUser, verifyFirebaseToken } from './auth.js'
+import { createAdminRouter } from './admin.js'
 
 const bookingFields = `b.id, b.status, b.observacoes,
   to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'YYYY-MM-DD') AS data,
@@ -94,6 +95,8 @@ export function createApp(query = (sql, params) => getPool().query(sql, params),
       response.json({ id: rows[0].id, status: 'cancelado' })
     } catch (error) { next(error) }
   })
+
+  app.use('/api/admin', authenticated, requireAdmin, createAdminRouter(query))
 
   app.use((error, _request, response, _next) => {
     console.error('Falha na API:', error)

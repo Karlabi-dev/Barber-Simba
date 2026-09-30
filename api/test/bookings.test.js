@@ -10,7 +10,7 @@ test('agendamentos exigem token e vinculam criação, listagem e cancelamento ao
     if (sql.includes('INSERT INTO bookings')) return { rows: [booking] }
     if (sql.includes('UPDATE bookings')) return { rows: [{ id: booking.id }] }
     return { rows: [booking] }
-  }, async token => token === 'valid' ? 'firebase-user-1' : null)
+  }, async token => token === 'valid' ? { uid: 'firebase-user-1' } : null)
   const server = app.listen(0)
   const base = `http://127.0.0.1:${server.address().port}`
   const auth = { Authorization: 'Bearer valid' }
@@ -35,7 +35,7 @@ test('agendamentos exigem token e vinculam criação, listagem e cancelamento ao
 })
 
 test('horário já reservado retorna conflito sem criar outro agendamento', async () => {
-  const app = createApp(async () => { const error = new Error('unique'); error.code = '23505'; throw error }, async () => 'user')
+  const app = createApp(async () => { const error = new Error('unique'); error.code = '23505'; throw error }, async () => ({ uid: 'user' }))
   const server = app.listen(0)
   try {
     const base = `http://127.0.0.1:${server.address().port}`

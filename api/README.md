@@ -35,3 +35,28 @@ Sem `VITE_USE_NEON=true`, o app mantém o modo de demonstração. Com a opção 
 As três rotas exigem `Authorization: Bearer <Firebase ID token>`. A API verifica assinatura, validade e projeto do token com Firebase Admin (`FIREBASE_PROJECT_ID=barber-simba`); nunca recebe uma senha do Firebase. O horário é interpretado em `America/Fortaleza`. Avaliações e notificações continuam locais e não representam mensagens efetivamente enviadas.
 
 Não envie o arquivo `.env` nem a URL do banco ao GitHub. As migrações usam a conexão direta do Neon; as consultas usam a URL agrupada.
+
+## API administrativa (sem telas)
+
+Todas as rotas `/api/admin/*` exigem `Authorization: Bearer <Firebase ID token>` de uma conta cujo token tenha a **custom claim booleana `admin: true`**. Uma conta autenticada sem essa permissão recebe 403; sem token válido, recebe 401. A permissão é conferida pela API com Firebase Admin, não pelo navegador, e não existe rota HTTP para concedê-la.
+
+| Rota | Função |
+| --- | --- |
+| `GET /api/admin/bookings?status=confirmado&offset=0` | Lista até 100 agendamentos por página, incluindo `firebaseUid`; `status` pode ser omitido ou ser `confirmado`, `concluido`, `cancelado`. |
+| `PATCH /api/admin/bookings/:id/status` | Recebe `{ "status": "concluido" }` ou `{ "status": "cancelado" }`, somente se o agendamento estiver confirmado. |
+| `GET /api/admin/services` e `GET /api/admin/professionals` | Lista todo o catálogo, inclusive registros inativos. |
+| `POST /api/admin/services` e `POST /api/admin/professionals` | Cadastra registros. Serviços exigem `slug`, `nome`, `categoria`, `preco` (texto decimal, por exemplo `"45.00"`) e `duracao` (minutos); profissionais exigem `slug` e `nome`. |
+| `PATCH /api/admin/services/:id` e `PATCH /api/admin/professionals/:id` | Atualiza somente os campos enviados. Use `{ "ativo": false }` para retirar do catálogo público sem apagar agendamentos anteriores. |
+
+Os demais campos aceitos nos serviços são `descricao`, `iconKey`, `ordem` e `ativo`; nos profissionais são `especialidade`, `avaliacao` (texto decimal entre 0 e 5, ou `null`), `dias`, `imageKey`, `ordem` e `ativo`. `slug` usa letras minúsculas, números e hífens. IDs inválidos e dados fora dos limites retornam 400; `slug` repetido retorna 409.
+
+### Conceder acesso a uma conta escolhida
+
+O responsável pelo projeto deve primeiro obter o **UID** da conta em Firebase Console → Authentication → Users. Em uma máquina confiável, configure `GOOGLE_APPLICATION_CREDENTIALS` com o caminho de uma chave de conta de serviço do **mesmo projeto Firebase** (`FIREBASE_PROJECT_ID`, por padrão `barber-simba`). Com o terminal na pasta `api`, execute:
+
+```powershell
+$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\caminho\seguro\firebase-service-account.json"
+npm.cmd run admin:claim -- grant UID_DA_CONTA
+```
+
+Para retirar a permissão: `npm.cmd run admin:claim -- revoke UID_DA_CONTA`. O script conserva outras custom claims da conta. Não envie a chave ao repositório ou ao navegador. Após uma mudança, a conta deve atualizar o ID token (por exemplo, sair e entrar de novo); tokens já emitidos podem continuar válidos até expirarem. Nenhuma conta recebe acesso administrativo automaticamente ao aplicar este código.
