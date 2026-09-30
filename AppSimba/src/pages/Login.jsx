@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { authErrorMessage } from '../services/authErrors'
 import AuthLayout from '../components/AuthLayout'
+import { homeForRole, roleFromClaims } from '../services/roles'
 
 export default function Login() {
   const { entrar, carregando, erroSessao } = useAuth()
@@ -16,7 +17,11 @@ export default function Login() {
     event.preventDefault()
     if (busy) return
     setError(''); setBusy(true)
-    try { await entrar(email, senha); navigate('/home', {replace:true}) }
+    try {
+      const user = await entrar(email, senha)
+      const { claims } = await user.getIdTokenResult(true)
+      navigate(homeForRole(roleFromClaims(claims)), { replace: true })
+    }
     catch (e) { setError(authErrorMessage(e)) }
     finally { setBusy(false) }
   }

@@ -45,13 +45,16 @@ Reservas novas precisam começar em um desses intervalos, caber integralmente no
 
 Não envie o arquivo `.env` nem a URL do banco ao GitHub. As migrações usam a conexão direta do Neon; as consultas usam a URL agrupada.
 
-## API administrativa (sem telas)
+## Painel e API administrativa
+
+O mesmo login do AppSimba abre `/admin` quando o token Firebase contém `admin: true`. O painel inicial mostra o resumo de hoje e os atendimentos de hoje, futuros e do histórico. Contas comuns seguem para `/home`. A área do profissional está reservada para uma etapa posterior; ela ainda não consulta uma agenda própria.
 
 Todas as rotas `/api/admin/*` exigem `Authorization: Bearer <Firebase ID token>` de uma conta cujo token tenha a **custom claim booleana `admin: true`**. Uma conta autenticada sem essa permissão recebe 403; sem token válido, recebe 401. A permissão é conferida pela API com Firebase Admin, não pelo navegador, e não existe rota HTTP para concedê-la.
 
 | Rota | Função |
 | --- | --- |
-| `GET /api/admin/bookings?status=confirmado&offset=0` | Lista até 100 agendamentos por página, incluindo `firebaseUid`; `status` pode ser omitido ou ser `confirmado`, `concluido`, `cancelado`. |
+| `GET /api/admin/dashboard` | Conta agendamentos, aguardando e finalizados no dia atual de Fortaleza. Não calcula faturamento sem registros de pagamento. |
+| `GET /api/admin/bookings?status=confirmado&period=upcoming&offset=0` | Lista até 100 agendamentos por página, incluindo `firebaseUid`; `status` pode ser omitido ou ser `confirmado`, `concluido`, `cancelado`. `period` pode ser `today`, `upcoming` ou omitido (histórico). |
 | `PATCH /api/admin/bookings/:id/status` | Recebe `{ "status": "concluido" }` ou `{ "status": "cancelado" }`, somente se o agendamento estiver confirmado. |
 | `GET /api/admin/services` e `GET /api/admin/professionals` | Lista todo o catálogo, inclusive registros inativos. |
 | `POST /api/admin/services` e `POST /api/admin/professionals` | Cadastra registros. Serviços exigem `slug`, `nome`, `categoria`, `preco` (texto decimal, por exemplo `"45.00"`) e `duracao` (minutos); profissionais exigem `slug` e `nome`. |

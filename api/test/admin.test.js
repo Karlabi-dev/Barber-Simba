@@ -18,7 +18,7 @@ test('todas as rotas administrativas exigem token e claim admin booleana', async
   const calls = []
   const { base, close } = await serve(async sql => { calls.push(sql); return { rows: [] } })
   try {
-    const paths = ['/api/admin/bookings', '/api/admin/services', '/api/admin/professionals']
+    const paths = ['/api/admin/bookings', '/api/admin/services', '/api/admin/professionals', '/api/admin/dashboard']
     for (const path of paths) {
       assert.equal((await fetch(base + path)).status, 401)
       assert.equal((await fetch(base + path, { headers: headers('user') })).status, 403)
@@ -27,6 +27,34 @@ test('todas as rotas administrativas exigem token e claim admin booleana', async
     }
     assert.equal(calls.length, paths.length)
     assert.ok(calls[1].includes('FROM services ORDER BY'))
+  } finally { await close() }
+})
+
+test('painel resume o dia de Fortaleza e filtra agenda sem aceitar período arbitrário', async () => {
+  const calls = []
+  const { base, close } = await serve(async (sql, params) => {
+    calls.push({ sql, params })
+    return sql.includes('count(*) AS "totalHoje"')
+      ? { rows: [{ totalHoje: '4', aguardandoHoje: '2', concluidosHoje: '1' }] }
+      : { rows: [{ id, status: 'confirmado' }] }
+  })
+  try {
+    const dashboard = await fetch(`${base}/api/admin/dashboard`, { headers: headers('admin') })
+    assert.equal(dashboard.status, 200)
+    assert.deepEqual(await dashboard.json(), { totalHoje: 4, aguardandoHoje: 2, concluidosHoje: 1 })
+    assert.match(calls[0].sql, /America\/Fortaleza/)
+
+    const today = await fetch(`${base}/api/admin/bookings?period=today`, { headers: headers('admin') })
+    assert.equal(today.status, 200)
+    assert.match(calls[1].sql, /America\/Fortaleza/)
+    assert.match(calls[1].sql, /ORDER BY b.starts_at ASC/)
+
+    const upcoming = await fetch(`${base}/api/admin/bookings?period=upcoming&status=confirmado`, { headers: headers('admin') })
+    assert.equal(upcoming.status, 200)
+    assert.deepEqual(calls[2].params, ['confirmado', 0])
+    assert.match(calls[2].sql, /b.starts_at >= now\(\)/)
+    assert.equal((await fetch(`${base}/api/admin/bookings?period=tomorrow`, { headers: headers('admin') })).status, 400)
+    assert.equal(calls.length, 3)
   } finally { await close() }
 })
 

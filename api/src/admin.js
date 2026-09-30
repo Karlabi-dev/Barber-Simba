@@ -56,12 +56,37 @@ function catalogError(error, next, response) {
 export function createAdminRouter(query) {
   const router = Router()
 
+  router.get('/dashboard', async (_request, response, next) => {
+    try {
+      const { rows } = await query(`SELECT
+        count(*) AS "totalHoje",
+        count(*) FILTER (WHERE status = 'confirmado') AS "aguardandoHoje",
+        count(*) FILTER (WHERE status = 'concluido') AS "concluidosHoje"
+        FROM bookings
+        WHERE (starts_at AT TIME ZONE 'America/Fortaleza')::date =
+          (now() AT TIME ZONE 'America/Fortaleza')::date`)
+      const summary = rows[0] || {}
+      response.json({
+        totalHoje: Number(summary.totalHoje || 0),
+        aguardandoHoje: Number(summary.aguardandoHoje || 0),
+        concluidosHoje: Number(summary.concluidosHoje || 0),
+      })
+    } catch (error) { next(error) }
+  })
+
   router.get('/bookings', async (request, response, next) => {
-    const { status, offset = '0' } = request.query
+    const { status, offset = '0', period } = request.query
     if (status !== undefined && !['confirmado', 'concluido', 'cancelado'].includes(status))
       return response.status(400).json({ error: 'Status inválido.' })
+    if (period !== undefined && !['today', 'upcoming'].includes(period))
+      return response.status(400).json({ error: 'Período inválido.' })
     if (typeof offset !== 'string' || !/^\d{1,6}$/.test(offset) || Number(offset) > 100000)
       return response.status(400).json({ error: 'Paginação inválida.' })
+    const periodClause = period === 'today'
+      ? `AND (b.starts_at AT TIME ZONE 'America/Fortaleza')::date =
+          (now() AT TIME ZONE 'America/Fortaleza')::date`
+      : period === 'upcoming' ? 'AND b.starts_at >= now()' : ''
+    const direction = period ? 'ASC' : 'DESC'
     try {
       const { rows } = await query(`SELECT b.id, b.firebase_uid AS "firebaseUid", b.status, b.observacoes,
         to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'YYYY-MM-DD') AS data,
@@ -69,8 +94,8 @@ export function createAdminRouter(query) {
         s.nome AS servico, p.nome AS profissional
         FROM bookings b JOIN services s ON s.id = b.service_id
         JOIN professionals p ON p.id = b.professional_id
-        WHERE ($1::text IS NULL OR b.status = $1)
-        ORDER BY b.starts_at DESC, b.id DESC LIMIT 100 OFFSET $2`, [status ?? null, Number(offset)])
+        WHERE ($1::text IS NULL OR b.status = $1) ${periodClause}
+        ORDER BY b.starts_at ${direction}, b.id ${direction} LIMIT 100 OFFSET $2`, [status ?? null, Number(offset)])
       response.json(rows)
     } catch (error) { next(error) }
   })
