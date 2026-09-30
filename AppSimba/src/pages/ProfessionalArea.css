@@ -1,0 +1,55 @@
+.professional-shell { width: min(100%, 410px); min-height: 100svh; margin: 0 auto; padding: 20px 14px 92px; color: #f7f7f7; background: #0e0f10; box-shadow: 0 0 35px #0008; }
+.professional-header { min-height: 46px; display: flex; align-items: center; gap: 9px; margin-bottom: 20px; }
+.professional-header h1 { margin: 0; flex: 1; color: #e5c158; font-size: 15px; }
+.professional-brand { color: #e5c158; font-size: 25px; }
+.professional-back { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #262729; color: #e5c158; font-size: 23px; }
+.professional-signout { border: 1px solid #4c3c22; border-radius: 16px; padding: 6px 10px; color: #e5c158; background: #202123; font-size: 11px; cursor: pointer; }
+.professional-bell { color: #e5c158; }
+.professional-bell svg { width: 19px; height: 19px; }
+.professional-shell h2 { margin: 18px 2px 9px; font-size: 13px; }
+.professional-greeting, .professional-subtitle { margin: -8px 2px 14px; color: #aaa; font-size: 11px; }
+.professional-overview { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.professional-overview > div { display: grid; gap: 5px; padding: 12px; border: 1px solid #262729; border-radius: 11px; background: #18191b; }
+.professional-overview span, .professional-overview small { color: #aaa; font-size: 10px; }
+.professional-overview strong { color: #e5c158; font-size: 22px; }
+.professional-panel, .professional-booking, .professional-service { border: 1px solid #292a2c; border-radius: 12px; background: #18191b; }
+.professional-panel { display: grid; gap: 8px; padding: 14px; font-size: 11px; }
+.professional-panel span, .professional-panel small, .professional-panel p { color: #aaa; margin: 0; }
+.professional-panel button { width: fit-content; border: 0; border-radius: 8px; padding: 11px; background: #e5c158; color: #141414; font-weight: 700; cursor: pointer; }
+.professional-section-heading { display: flex; align-items: center; justify-content: space-between; }
+.professional-section-heading a { color: #e5c158; font-size: 10px; }
+.professional-booking { display: flex; align-items: center; gap: 9px; min-height: 80px; margin-bottom: 8px; padding: 10px 8px; }
+.professional-booking-avatar { flex: 0 0 37px; width: 37px; height: 37px; border: 1px solid #e5c158; border-radius: 50%; display: grid; place-items: center; color: #e5c158; background: #343434; font-weight: 700; }
+.professional-booking-copy { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.professional-booking-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.professional-booking-copy span, .professional-booking-copy small { color: #aaa; font-size: 9px; }
+.professional-booking-side { display: grid; gap: 6px; justify-items: end; }
+.professional-status { max-width: 83px; padding: 4px 6px; border-radius: 6px; font-size: 8px; background: #3d3019; color: #e5c158; text-align: center; }
+.professional-status-concluido { background: #1a3322; color: #78d992; }
+.professional-status-cancelado { background: #3b2024; color: #f18d8d; }
+.professional-booking-side button { border: 1px solid #e5c158; border-radius: 6px; padding: 5px 7px; color: #e5c158; background: transparent; font-size: 9px; cursor: pointer; }
+.professional-booking-side button:disabled { opacity: .6; }
+.professional-message, .professional-error { padding: 14px 10px; color: #aaa; font-size: 11px; line-height: 1.5; }
+.professional-error { color: #ffb4b4; }
+.professional-error button { border: 0; color: #e5c158; background: transparent; text-decoration: underline; cursor: pointer; }
+.professional-date-control { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px; background: #18191b; border-radius: 10px; }
+.professional-date-control > button { border: 0; background: #28292b; color: #e5c158; border-radius: 50%; width: 27px; height: 27px; font-size: 21px; cursor: pointer; }
+.professional-date-control label { display: grid; gap: 4px; color: #aaa; font-size: 9px; }
+.professional-date-control input { border: 0; background: transparent; color: #f7f7f7; color-scheme: dark; font-size: 12px; }
+.professional-switch, .professional-filters { display: flex; gap: 5px; overflow-x: auto; margin: 12px 0; padding-bottom: 4px; }
+.professional-switch button, .professional-filters button { border: 0; border-radius: 12px; padding: 8px 10px; flex-shrink: 0; background: #222326; color: #aaa; font-size: 9px; cursor: pointer; }
+.professional-switch button[aria-pressed='true'], .professional-filters button[aria-pressed='true'], .professional-filters button[aria-selected='true'] { background: #e5c158; color: #111; font-weight: 700; }
+.professional-identity { display: grid; justify-items: center; gap: 5px; margin: 14px 0 24px; }
+.professional-identity > div { display: grid; place-items: center; width: 60px; height: 60px; border: 1px solid #e5c158; border-radius: 14px; background: #796038; font-size: 28px; font-weight: 700; }
+.professional-identity h2 { margin: 0; font-size: 14px; }
+.professional-identity p { margin: 0; color: #aaa; font-size: 10px; }
+.professional-profile-tabs { flex-wrap: wrap; }
+.professional-service { display: flex; align-items: center; gap: 9px; margin: 8px 0; padding: 12px; }
+.professional-service > span { padding: 9px; border-radius: 8px; background: #28292b; color: #e5c158; }
+.professional-service strong { flex: 1; display: grid; gap: 4px; font-size: 11px; }
+.professional-service small { color: #aaa; font-weight: 400; font-size: 9px; }
+.professional-service b { color: #e5c158; font-size: 11px; }
+.professional-footer { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); width: min(calc(100% - 28px), 382px); min-height: 58px; border-radius: 15px; display: grid; grid-template-columns: repeat(3, 1fr); background: #59010c; }
+.professional-footer a { display: grid; justify-items: center; align-content: center; color: #ddd; font-size: 10px; }
+.professional-footer a > span { font-size: 20px; line-height: 1; }
+.professional-footer a.active { color: #e5c158; }

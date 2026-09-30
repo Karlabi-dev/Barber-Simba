@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom'
 import AdminPage from '../components/AdminPage'
 import { useAuth } from '../hooks/useAuth'
-import { loadAdminHours, loadAdminProfessionals, saveAdminProfessional, saveAdminHours, deleteAdminHours, deleteAdminProfessional } from '../services/admin'
+import { loadAdminHours, loadAdminProfessionals, saveAdminProfessional, saveAdminHours, deleteAdminHours, deleteAdminProfessional, loadAdminProfessionalAccess, linkAdminProfessionalAccess, unlinkAdminProfessionalAccess } from '../services/admin'
 import { slugFromName } from '../services/adminForm'
 import profileIcon from '../assets/icons/perfil.png'
 import allander from '../assets/allander.png'
@@ -12,6 +12,65 @@ const days = [['1', 'Seg'], ['2', 'Ter'], ['3', 'Qua'], ['4', 'Qui'], ['5', 'Sex
 const blank = { nome: '', slug: '', especialidade: '', ativo: true }
 const emptyWeek = () => Object.fromEntries(days.map(([day]) => [day, { enabled: false, abertura: '09:00', fechamento: '19:00' }]))
 const minutes = time => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5))
+
+function ProfessionalAccess({ user, id }) {
+  const [access, setAccess] = useState(null)
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+
+  useEffect(() => {
+    const controller = new AbortController()
+    loadAdminProfessionalAccess(user, id, controller.signal)
+      .then(value => { setAccess(value); setError('') })
+      .catch(cause => { if (!controller.signal.aborted) setError(cause.message) })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false) })
+    return () => controller.abort()
+  }, [user, id])
+
+  async function link(event) {
+    event.preventDefault()
+    if (saving) return
+    setSaving(true)
+    setError('')
+    setNotice('')
+    try {
+      const value = await linkAdminProfessionalAccess(user, id, email.trim())
+      setAccess(value)
+      setEmail('')
+      setNotice('Acesso vinculado. O profissional deve sair e entrar novamente no app.')
+    } catch (cause) { setError(cause.message) }
+    finally { setSaving(false) }
+  }
+
+  async function unlink() {
+    if (saving || !window.confirm(`Remover o acesso de ${access.email}?`)) return
+    setSaving(true)
+    setError('')
+    setNotice('')
+    try {
+      await unlinkAdminProfessionalAccess(user, id)
+      setAccess({ email: null })
+      setNotice('Acesso removido. Sessões anteriores ainda podem mostrar a tela até atualizar o token, mas a API já bloqueia a agenda.')
+    } catch (cause) { setError(cause.message) }
+    finally { setSaving(false) }
+  }
+
+  return <section className="admin-access" aria-label="Acesso ao app">
+    <h2>Acesso ao app</h2>
+    {loading ? <p className="admin-feedback">Carregando acesso...</p> : access?.email
+      ? <><p>Conta vinculada: <strong>{access.email}</strong></p><button type="button" onClick={unlink} disabled={saving}>Remover acesso</button></>
+      : <form className="admin-form" onSubmit={link}>
+        <p>O profissional deve criar sua conta no app primeiro. Depois, vincule o e-mail usado no cadastro a este perfil.</p>
+        <label>E-mail da conta Firebase<input type="email" value={email} onChange={event => setEmail(event.target.value)} required maxLength="254" autoComplete="off" /></label>
+        <button type="submit" disabled={saving}>{saving ? 'Vinculando...' : 'Vincular acesso'}</button>
+      </form>}
+    {error && <p className="admin-error" role="alert">{error}</p>}
+    {notice && <p className="admin-feedback" role="status">{notice}</p>}
+  </section>
+}
 
 export function AdminTeam() {
   const { usuario } = useAuth()
@@ -153,9 +212,10 @@ export function AdminProfessionalForm() {
         {week[day].enabled && <div className="admin-form-row"><label>Início<input aria-label={`${label}: início`} type="time" value={week[day].abertura} onChange={event => updateDay(day, { abertura: event.target.value })} required /></label><label>Fim<input aria-label={`${label}: fim`} type="time" value={week[day].fechamento} onChange={event => updateDay(day, { fechamento: event.target.value })} required /></label></div>}
       </div>)}</fieldset>
       <label className="admin-check"><input type="checkbox" checked={form.ativo} onChange={event => setForm({ ...form, ativo: event.target.checked })} /> Disponível para agendamento</label>
-      <p className="admin-form-note">Este cadastro cria o perfil da equipe. O acesso do profissional ao app será configurado separadamente.</p>
+      {creating && <p className="admin-form-note">Depois de salvar, abra este profissional em Equipe para vincular uma conta já cadastrada no app.</p>}
       {error && <p className="admin-error" role="alert">{error}</p>}
       <button className="admin-save" type="submit" disabled={saving}>{saving ? 'Salvando...' : creating ? 'Cadastrar profissional' : 'Salvar alterações'}</button>
     </form>}
+    {!creating && form && <ProfessionalAccess user={usuario} id={id} />}
   </AdminPage>
 }

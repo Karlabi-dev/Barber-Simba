@@ -19,6 +19,7 @@ import AdminServices from './pages/AdminServices'
 import { AdminTeam, AdminProfessionalForm } from './pages/AdminTeam'
 import AdminAgenda from './pages/AdminAgenda'
 import AdminBookingDetails from './pages/AdminBookingDetails'
+import { ProfessionalDashboard, ProfessionalAgenda, ProfessionalProfile, ProfessionalNotifications } from './pages/ProfessionalArea'
 import { useAuth } from './hooks/useAuth'
 import { homeForRole } from './services/roles'
 
@@ -50,11 +51,6 @@ function LoginRoute() {
   return usuario ? <Navigate to={homeForRole(papel)} replace /> : <Login />
 }
 
-function ProfessionalLanding() {
-  const { sair } = useAuth()
-  return <main className="route-loading"><h1>Área do profissional</h1><p>A agenda do profissional será configurada na próxima etapa.</p><button type="button" onClick={sair}>Sair</button></main>
-}
-
 function AdminProfessionalRoute() {
   const { id } = useParams()
   return <AdminProfessionalForm key={id} />
@@ -83,7 +79,10 @@ export default function App() {
     <Route path="/admin/servicos" element={<RoleRoute role="admin"><AdminServices /></RoleRoute>} />
     <Route path="/admin/equipe" element={<RoleRoute role="admin"><AdminTeam /></RoleRoute>} />
     <Route path="/admin/equipe/:id" element={<RoleRoute role="admin"><AdminProfessionalRoute /></RoleRoute>} />
-    <Route path="/profissional" element={<RoleRoute role="profissional"><ProfessionalLanding /></RoleRoute>} />
+    <Route path="/profissional" element={<RoleRoute role="profissional"><ProfessionalDashboard /></RoleRoute>} />
+    <Route path="/profissional/agenda" element={<RoleRoute role="profissional"><ProfessionalAgenda /></RoleRoute>} />
+    <Route path="/profissional/perfil" element={<RoleRoute role="profissional"><ProfessionalProfile /></RoleRoute>} />
+    <Route path="/profissional/notificacoes" element={<RoleRoute role="profissional"><ProfessionalNotifications /></RoleRoute>} />
     <Route path="*" element={<StartRoute />} />
   </Routes></BrowserRouter>
 }

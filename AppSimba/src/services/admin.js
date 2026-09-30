@@ -5,8 +5,11 @@ async function adminRequest(user, path, { signal, method, body } = {}) {
     headers: { Authorization: `Bearer ${token}`, ...(body ? { 'Content-Type': 'application/json' } : {}) },
     ...(body ? { body: JSON.stringify(body) } : {}),
   })
-  const result = await response.json()
-  if (!response.ok) throw new Error(result.error || 'Não foi possível consultar o painel.')
+  const content = await response.text()
+  let result
+  try { result = content ? JSON.parse(content) : null } catch { /* resposta do proxy não é JSON */ }
+  if (!response.ok) throw new Error(result?.error || `Não foi possível consultar o painel (HTTP ${response.status}).`)
+  if (result === null || result === undefined) throw new Error('A API não respondeu com dados. Confira se ela está em execução.')
   return result
 }
 
@@ -48,6 +51,13 @@ export const saveAdminProfessional = (user, professional, id) => adminRequest(us
   { method: id ? 'PATCH' : 'POST', body: professional })
 export const deleteAdminProfessional = (user, id) => adminRequest(user,
   `/professionals/${encodeURIComponent(id)}`, { method: 'DELETE' })
+
+export const loadAdminProfessionalAccess = (user, id, signal) => adminRequest(user,
+  `/professionals/${encodeURIComponent(id)}/access`, { signal })
+export const linkAdminProfessionalAccess = (user, id, email) => adminRequest(user,
+  `/professionals/${encodeURIComponent(id)}/access`, { method: 'PUT', body: { email } })
+export const unlinkAdminProfessionalAccess = (user, id) => adminRequest(user,
+  `/professionals/${encodeURIComponent(id)}/access`, { method: 'DELETE' })
 
 export const loadAdminHours = (user, id, signal) => adminRequest(user,
   `/professionals/${encodeURIComponent(id)}/hours`, { signal })

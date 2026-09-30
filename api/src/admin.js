@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { getAuth } from 'firebase-admin/auth'
 import { minutes, scheduleDays, validDate, validTime } from './availability.js'
 
 const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i
@@ -59,8 +60,67 @@ function catalogError(error, next, response) {
   next(error)
 }
 
-export function createAdminRouter(query) {
+export function createAdminRouter(query, accountDirectory) {
   const router = Router()
+  const directory = () => accountDirectory || getAuth()
+
+  router.get('/professionals/:id/access', async (request, response, next) => {
+    if (!uuid.test(request.params.id)) return response.status(400).json({ error: 'Profissional inválido.' })
+    try {
+      const { rows } = await query(`SELECT a.email FROM professionals p
+        LEFT JOIN professional_accounts a ON a.professional_id = p.id WHERE p.id = $1`, [request.params.id])
+      if (!rows.length) return response.status(404).json({ error: 'Profissional não encontrado.' })
+      response.json({ email: rows[0].email })
+    } catch (error) { next(error) }
+  })
+
+  router.put('/professionals/:id/access', async (request, response, next) => {
+    const email = request.body?.email?.trim().toLowerCase()
+    if (!uuid.test(request.params.id) || typeof email !== 'string' || email.length > 254 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || Object.keys(request.body || {}).length !== 1)
+      return response.status(400).json({ error: 'Informe o e-mail de uma conta Firebase existente.' })
+    try {
+      let account
+      try { account = await directory().getUserByEmail(email) }
+      catch (error) {
+        if (error.code === 'auth/user-not-found') return response.status(404).json({ error: 'Essa conta ainda não foi cadastrada no app.' })
+        throw error
+      }
+      if (account.disabled || account.customClaims?.admin === true)
+        return response.status(409).json({ error: 'Esta conta não pode ser vinculada a um profissional.' })
+      const { rows } = await query(`INSERT INTO professional_accounts (professional_id, firebase_uid, email)
+        SELECT id, $2, $3 FROM professionals WHERE id = $1 AND ativo = true
+        ON CONFLICT DO NOTHING RETURNING professional_id`, [request.params.id, account.uid, email])
+      if (!rows.length) return response.status(409).json({ error: 'Profissional inativo ou conta já vinculada. Desvincule antes de alterar o acesso.' })
+      try {
+        await directory().setCustomUserClaims(account.uid, { ...account.customClaims, professional: true })
+      } catch (error) {
+        await query('DELETE FROM professional_accounts WHERE professional_id = $1 AND firebase_uid = $2', [request.params.id, account.uid])
+        throw error
+      }
+      response.json({ email })
+    } catch (error) { next(error) }
+  })
+
+  router.delete('/professionals/:id/access', async (request, response, next) => {
+    if (!uuid.test(request.params.id)) return response.status(400).json({ error: 'Profissional inválido.' })
+    try {
+      const { rows } = await query('SELECT firebase_uid FROM professional_accounts WHERE professional_id = $1', [request.params.id])
+      if (!rows.length) return response.status(404).json({ error: 'Este profissional não possui acesso vinculado.' })
+      let account
+      try { account = await directory().getUser(rows[0].firebase_uid) }
+      catch (error) {
+        if (error.code !== 'auth/user-not-found') throw error
+        await query('DELETE FROM professional_accounts WHERE professional_id = $1 AND firebase_uid = $2', [request.params.id, rows[0].firebase_uid])
+        return response.json({ removido: true })
+      }
+      const claims = { ...account.customClaims }
+      delete claims.professional
+      await directory().setCustomUserClaims(account.uid, claims)
+      await query('DELETE FROM professional_accounts WHERE professional_id = $1 AND firebase_uid = $2', [request.params.id, account.uid])
+      response.json({ removido: true })
+    } catch (error) { next(error) }
+  })
 
   router.get('/dashboard', async (_request, response, next) => {
     try {
@@ -235,7 +295,7 @@ export function createAdminRouter(query) {
         response.json({ id: rows[0].id, excluido: true })
       } catch (error) {
         if (error.code === '23503')
-          return response.status(409).json({ error: 'Este cadastro possui agendamentos e não pode ser excluído. Desative-o para preservar o histórico.' })
+          return response.status(409).json({ error: 'Este cadastro possui agendamentos ou acesso vinculado e não pode ser excluído. Desative-o para preservar o histórico.' })
         next(error)
       }
     })

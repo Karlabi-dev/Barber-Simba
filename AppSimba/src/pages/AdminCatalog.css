@@ -34,3 +34,9 @@
 .admin-week legend { margin-bottom: 8px; font-size: 11px; font-weight: 700; }
 .admin-day { padding: 8px; border: 1px solid #292a2c; border-radius: 9px; background: #18191b; }
 .admin-day .admin-form-row { margin-top: 8px; }
+.admin-access { margin: 20px 0 6px; padding: 14px; border: 1px solid #37302a; border-radius: 12px; background: #18191b; }
+.admin-access h2 { margin: 0 0 10px; font-size: 14px; color: #e5c158; }
+.admin-access p { color: #bcbcbc; font-size: 11px; line-height: 1.5; }
+.admin-access button { border: 0; border-radius: 9px; padding: 11px 14px; color: #111; background: #e5c158; font-weight: 700; cursor: pointer; }
+.admin-access button:disabled { opacity: .6; }
+.admin-access .admin-error { color: #ffb2b2; }
