@@ -1,19 +1,38 @@
+import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import Header from '../components/Header'
 import Button from '../components/Button'
-import { readBooking, confirmBooking } from '../data/booking'
+import { readBooking, saveBooking, confirmBooking } from '../data/booking'
+import { createBooking } from '../services/bookings'
+import { useAuth } from '../hooks/useAuth'
 import { barbeiros } from '../data/barbeiros'
 import calendar from '../assets/icons/calendario.png'
 import location from '../assets/icons/localizador.png'
 import bell from '../assets/icons/sino.png'
 
 export default function BookingReview() {
+  const useNeon = import.meta.env.VITE_USE_NEON === 'true'
+  const { usuario } = useAuth()
   const navigate = useNavigate()
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
   const draft = readBooking()
   if (!draft?.data || !draft?.horario) return <Navigate to="/agendamento" replace />
   const barber = barbeiros.find(item => item.nome === draft.profissional) || barbeiros[0]
   const date = new Date(draft.data + 'T12:00:00').toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long'})
+  async function confirm() {
+    if (saving) return
+    setSaving(true)
+    setError('')
+    try {
+      if (useNeon) {
+        const created = await createBooking(usuario, draft)
+        saveBooking({ ...draft, ...created, confirmado: true })
+      } else confirmBooking(draft)
+      navigate('/agendamento-confirmado')
+    } catch (cause) { setError(cause.message); setSaving(false) }
+  }
   return <AppShell nav={false}><Header title="Confirmar agendamento" compact backTo="/agendamento" />
     <section className="success-heading"><span className="check-circle">✓</span><h2>Quase tudo pronto!</h2><p>Revise os detalhes do seu agendamento abaixo antes de confirmar.</p></section>
     <article className="review-card"><div className="review-label"><strong>Profissional Especializado</strong><em>{draft.servico}</em></div>
@@ -23,6 +42,8 @@ export default function BookingReview() {
       {draft.observacoes && <p>Observações: {draft.observacoes}</p>}
     </article>
     <div className="reminder"><img src={bell} alt="" /><p>Demonstração local: notificações por WhatsApp e e-mail ainda não estão integradas.</p></div>
-    <div className="review-actions"><Button onClick={() => {confirmBooking(draft); navigate('/agendamento-confirmado')}}>Confirmar Agendamento</Button><Button variant="secondary" onClick={() => navigate('/agendamento')}>Editar Agendamento</Button></div>
+    {useNeon && !usuario && <p role="alert">Entre na sua conta antes de confirmar. <a href="/login">Fazer login</a></p>}
+    {error && <p role="alert">{error}</p>}
+    <div className="review-actions"><Button onClick={confirm} disabled={saving || (useNeon && !usuario)}>{saving ? 'Confirmando...' : 'Confirmar Agendamento'}</Button><Button variant="secondary" onClick={() => navigate('/agendamento')}>Editar Agendamento</Button></div>
   </AppShell>
 }

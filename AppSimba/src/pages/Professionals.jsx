@@ -1,13 +1,18 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import Header from '../components/Header'
 import { barbeiros } from '../data/barbeiros'
 import { saveBooking } from '../data/booking'
+import { loadProfessionals } from '../services/catalog'
 import { filterProfessionals, readReviews, saveReview, readReviewBookings, createReviewDemo, removeReviewDemo } from '../data/reviews'
 import './Professionals.css'
 
 export default function Professionals() {
+  const useNeon = import.meta.env.VITE_USE_NEON === 'true'
+  const [catalog, setCatalog] = useState(useNeon ? [] : barbeiros)
+  const [loading, setLoading] = useState(useNeon)
+  const [catalogError, setCatalogError] = useState('')
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('all')
   const [filterOpen, setFilterOpen] = useState(false)
@@ -22,7 +27,17 @@ export default function Professionals() {
   const [message, setMessage] = useState('')
   const dialog = useRef(null)
   const navigate = useNavigate()
-  const filtered = filterProfessionals(barbeiros, {search, service, day, rating})
+  useEffect(() => {
+    if (!useNeon) return
+    const controller = new AbortController()
+    loadProfessionals(controller.signal)
+      .then(items => { setCatalog(items); setLoading(false) })
+      .catch(cause => {
+        if (cause.name !== 'AbortError') { setCatalogError(cause.message); setLoading(false) }
+      })
+    return () => controller.abort()
+  }, [useNeon])
+  const filtered = filterProfessionals(catalog, {search, service, day, rating})
   const reviewBookings = readReviewBookings()
   const hasDemo = reviewBookings.some(item => item.demo)
   const history = reviewBookings.filter(item => item.status === 'concluido' && item.profissional.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) && (historyFilter === 'rated' ? !!reviews[item.id] : !reviews[item.id]))
@@ -42,19 +57,19 @@ export default function Professionals() {
     saveBooking({profissional:item.profissional, servico:item.servico, data:'', horario:'', observacoes:''})
     navigate(`/agendamento?${new URLSearchParams({profissional:item.profissional, servico:item.servico})}`)
   }
-  const person = selected && barbeiros.find(item => item.nome === selected.profissional)
+  const person = selected && catalog.find(item => item.nome === selected.profissional)
   return <AppShell className="professionals-screen"><Header title="PROFISSIONAIS" compact />
     <label className="search"><span aria-hidden="true">⌕</span><input value={search} onChange={event => setSearch(event.target.value)} aria-label="Buscar profissionais" placeholder="Buscar profissionais" /></label>
     <div className="professionals-tabs" role="group" aria-label="Seção de profissionais"><button aria-pressed={tab === 'all'} onClick={() => setTab('all')}>Todos</button><button aria-pressed={tab === 'history'} onClick={() => setTab('history')}>Histórico de avaliações</button></div>
     {tab === 'all' ? <>
       <div className="professionals-tabs"><button aria-expanded={filterOpen} aria-controls="professional-filters" onClick={() => setFilterOpen(!filterOpen)}>▽ Filtrar{[service,day,rating].filter(Boolean).length ? ` (${[service,day,rating].filter(Boolean).length})` : ''}</button></div>
       {filterOpen && <div id="professional-filters" className="professional-filters">
-        <label>Serviço / especialidade<select value={service} onChange={event => setService(event.target.value)}><option value="">Todos</option>{[...new Set(barbeiros.map(item => item.especialidade))].map(value => <option key={value}>{value}</option>)}</select></label>
+        <label>Serviço / especialidade<select value={service} onChange={event => setService(event.target.value)}><option value="">Todos</option>{[...new Set(catalog.map(item => item.especialidade))].map(value => <option key={value}>{value}</option>)}</select></label>
         <label>Dia disponível<select value={day} onChange={event => setDay(event.target.value)}><option value="">Todos os dias</option>{['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(value => <option key={value}>{value}</option>)}</select></label>
         <label>Nota mínima<select value={rating} onChange={event => setRating(event.target.value)}><option value="">Todas as notas</option>{[3,4,4.5,4.8,5].map(value => <option key={value} value={value}>{value.toLocaleString('pt-BR')} estrelas</option>)}</select></label>
         <button onClick={() => {setService('');setDay('');setRating('')}}>Limpar filtros</button>
       </div>}
-      <section className="professionals-results">{filtered.map(item => <article className="professional-row" key={item.nome}><img src={item.foto} alt="" /><div className="professional-info"><h2>{item.nome} <span className="professional-rating">★ {item.avaliacao}</span></h2><p>{item.especialidade}</p><small>{item.dias.split('/').join(', ')}</small></div><Link className="professional-action" to={`/agendamento?${new URLSearchParams({profissional:item.nome})}`}>AGENDAR</Link></article>)}{!filtered.length && <p className="professionals-empty" role="status">Nenhum profissional encontrado com esses filtros.</p>}</section>
+      <section className="professionals-results">{loading && <p role="status">Carregando profissionais...</p>}{catalogError && <p role="alert">{catalogError}</p>}{!loading && !catalogError && filtered.map(item => <article className="professional-row" key={item.id || item.nome}><img src={item.foto} alt="" /><div className="professional-info"><h2>{item.nome} <span className="professional-rating">★ {item.avaliacao}</span></h2><p>{item.especialidade}</p><small>{item.dias.split('/').join(', ')}</small></div><Link className="professional-action" to={`/agendamento?${new URLSearchParams({profissional:item.nome})}`}>AGENDAR</Link></article>)}{!loading && !catalogError && !filtered.length && <p className="professionals-empty" role="status">Nenhum profissional encontrado com esses filtros.</p>}</section>
     </> : <>
       <aside className="review-demo"><strong>Teste de avaliação</strong><p>Atendimento fictício para experimentar o painel de estrelas.</p>{hasDemo ? <button onClick={() => demoAction(true)}>Remover dados de teste</button> : <button onClick={() => demoAction()}>Criar atendimento de teste</button>}</aside>
       <div className="professionals-tabs" role="group" aria-label="Filtrar avaliações"><button aria-pressed={historyFilter === 'pending'} onClick={() => setHistoryFilter('pending')}>Pendentes</button><button aria-pressed={historyFilter === 'rated'} onClick={() => setHistoryFilter('rated')}>Avaliados</button></div>
