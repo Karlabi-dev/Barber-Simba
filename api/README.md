@@ -8,14 +8,12 @@ Projeto `simba-barber` (`spring-smoke-73415339`), banco `neondb`:
 
 | Branch | Uso | Situação em 30/09/2026 |
 | --- | --- | --- |
-| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; migrações `001`, `002` e `003_availability.sql` aplicadas. A migração `004_in_progress.sql` precisa ser aplicada antes de testar as telas novas. As URLs desta branch estão no `api/.env` local de desenvolvimento. |
-| `production` | Futuro ambiente publicado | Branch padrão; apenas as migrações `001_initial.sql` e `002_seed_catalog.sql` estão aplicadas. São 4 serviços, 8 profissionais e 0 agendamentos. **A migração `003` ainda não foi aplicada**; a API ainda não foi publicada. |
+| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; migrações `001` a `004` aplicadas. As URLs desta branch estão no `api/.env` local de desenvolvimento. |
+| `production` | Futuro ambiente publicado | Branch padrão; migrações `001` a `004` aplicadas e verificadas no SQL Editor em 30/09/2026. A API ainda não foi publicada. |
 
 Cada branch tem suas próprias URLs de conexão. Não use a URL de `production` no `.env` local ao testar agendamentos e novas telas. O arquivo `.env` contém credenciais e não deve ser enviado ao GitHub.
 
-O código da API com disponibilidade exige a migração `003` antes de atender agendamentos. Na `production`, aplique essa migração com a conexão direta somente após a autorização da mudança nesse ambiente.
-
-A agenda administrativa e o status `em_atendimento` exigem a migração `004_in_progress.sql`. Na branch de desenvolvimento, confira que `DATABASE_URL_UNPOOLED` aponta para `dev-simba-integracao` e execute `npm.cmd run db:migrate` na pasta `api` **antes de reiniciar a API**. O script registra a migração aplicada e não a repete. Essa atualização não foi aplicada à branch `production`.
+A disponibilidade exige a migração `003_availability.sql`; a agenda administrativa e o status `em_atendimento` exigem `004_in_progress.sql`. O script `npm.cmd run db:migrate` usa a conexão direta `DATABASE_URL_UNPOOLED`, registra as migrações e não as repete. Confira a branch de destino antes de executar novas migrações.
 
 ## Configuração local
 
