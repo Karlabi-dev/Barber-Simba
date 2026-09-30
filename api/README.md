@@ -2,6 +2,17 @@
 
 Catálogo público e agendamentos no Postgres do Neon. A tela de avaliações e as notificações ainda são demonstrações locais.
 
+## Ambientes Neon
+
+Projeto `simba-barber` (`spring-smoke-73415339`), banco `neondb`:
+
+| Branch | Uso | Situação em 30/09/2026 |
+| --- | --- | --- |
+| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; esquema e catálogo aplicados. As URLs desta branch já estão no `api/.env` local de desenvolvimento. |
+| `production` | Futuro ambiente publicado | Branch padrão; ainda sem tabelas do Simba. Aplicar as migrações antes de apontar uma API publicada para ela. |
+
+Cada branch tem suas próprias URLs de conexão. Não use a URL de `production` no `.env` local ao testar agendamentos e novas telas. O arquivo `.env` contém credenciais e não deve ser enviado ao GitHub.
+
 ## Configuração local
 
 1. Crie uma branch de desenvolvimento no projeto Neon do Simba e copie suas URLs de conexão.
