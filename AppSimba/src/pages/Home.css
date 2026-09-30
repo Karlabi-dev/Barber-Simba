@@ -1,0 +1,150 @@
+/* Home-only layout: other screens keep their existing scroll behavior. */
+.app-shell.home-screen {
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.home-screen .status-bar { flex-shrink: 0; }
+.home-screen .screen-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #454035 transparent;
+  padding-bottom: 24px;
+}
+
+.home-screen .brand-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 60px;
+  background: #0e0f10f5;
+  backdrop-filter: blur(12px);
+}
+
+.home-screen .navbar { position: relative; bottom: auto; margin-top: 8px; }
+.home-screen .greeting { margin: 14px 0 22px; }
+.home-screen .greeting h1 { font-size: 24px; margin-bottom: 7px; letter-spacing: -.7px; }
+.home-screen .greeting p { font-size: 11px; line-height: 1.5; }
+
+.home-screen .hero-card {
+  height: 260px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #e5c15855;
+  background-image: linear-gradient(180deg, #090a0b12 0%, #090a0b38 28%, #090a0bc9 60%, #090a0bf5 100%), var(--hero-image);
+  background-size: cover;
+  background-position: center 45%;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 12px 32px #0003;
+}
+
+.home-screen .home-hero-badge {
+  align-self: flex-start;
+  padding: 7px 10px;
+  border: 1px solid #ffffff2e;
+  border-radius: 30px;
+  background: #0e0f1099;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+}
+
+.home-screen .home-hero-copy { width: 100%; }
+.home-screen .hero-card h2 { color: #fff; font-size: 27px; line-height: 1.08; letter-spacing: -.8px; margin: 0 0 8px; }
+.home-screen .hero-card p { color: #e0dcd6; font-size: 11px; line-height: 1.5; max-width: 265px; margin: 0 0 15px; }
+.home-screen .hero-card strong {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  min-height: 44px;
+  border-radius: 11px;
+  font-size: 12px;
+  letter-spacing: 0;
+  transition: background .2s;
+}
+.home-screen .hero-card strong span { color: #101112; font-size: 19px; line-height: 1; }
+.home-screen .hero-card:hover strong { background: #f0d37e; }
+
+.home-promotions { margin-top: 26px; }
+.home-section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.home-eyebrow { display: block; color: var(--gold); font-size: 8px; font-weight: 600; letter-spacing: 1.6px; margin-bottom: 5px; }
+.home-section-heading h2 { margin: 0; font-size: 18px; letter-spacing: -.4px; }
+.home-carousel-pause, .home-carousel-arrow {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: #e7dfcc;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+}
+.home-carousel-pause { font-size: 15px; }
+.home-carousel-pause[aria-pressed="true"] { color: var(--gold); border-color: #e5c15866; }
+.home-promo-window { overflow: hidden; border-radius: 18px; border: 1px solid var(--line); background: #080808; }
+.home-promo-track { display: flex; transition: transform .55s cubic-bezier(.22,.61,.36,1); }
+.home-promo-slide { flex: 0 0 100%; min-width: 0; }
+.home-promo-art {
+  display: block;
+  position: relative;
+  padding: 0;
+  border: 0;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #080808;
+  cursor: zoom-in;
+}
+.home-promo-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.home-promo-expand { position: absolute; bottom: 10px; right: 10px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; color: #fff; background: #0009; font-size: 20px; }
+.home-promo-caption { min-height: 72px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #ffffff0d; background: #191a1c; }
+.home-promo-caption > div { min-width: 0; }
+.home-promo-caption div > span { color: var(--gold); font-size: 10px; font-weight: 600; }
+.home-promo-caption h3 { font-size: 12px; line-height: 1.45; font-weight: 500; margin: 4px 0 0; color: #ecebea; }
+.home-promo-tag { flex-shrink: 0; font-size: 8px; color: #c3b681; border: 1px solid #e5c15826; border-radius: 20px; padding: 5px 8px; }
+.home-carousel-controls { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.home-carousel-arrow { width: 32px; height: 32px; font-size: 24px; }
+.home-carousel-dots { display: flex; align-items: center; gap: 2px; flex: 1; padding-left: 5px; }
+.home-carousel-dots button { display: grid; place-items: center; width: 30px; height: 32px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.home-carousel-dots span { height: 5px; width: 5px; border-radius: 5px; background: #545557; transition: width .3s, background .3s; }
+.home-carousel-dots button[aria-pressed="true"] span { width: 22px; background: var(--gold); }
+.home-carousel-count { color: #9b9995; font-size: 10px; font-variant-numeric: tabular-nums; letter-spacing: 1px; margin-right: 6px; }
+
+.home-screen .section-block { margin-top: 24px; }
+.home-screen .section-block > h2, .home-screen .section-title h2 { font-size: 15px; margin-bottom: 12px; }
+.home-screen .appointment-person { padding: 14px; gap: 10px; }
+.home-screen .appointment-time { margin: 0 14px 14px; padding: 11px; }
+.home-screen .barber-card { min-width: 124px; padding: 12px; }
+.home-screen .barber-avatar { width: 60px; height: 60px; }
+
+.home-promo-dialog { border: 1px solid #39352b; border-radius: 18px; padding: 44px 8px 8px; background: #101112; width: min(92vw, 580px); max-width: 92vw; max-height: 90svh; }
+.home-promo-dialog::backdrop { background: #000c; backdrop-filter: blur(6px); }
+.home-promo-dialog img { display: block; width: 100%; max-height: calc(90svh - 65px); object-fit: contain; }
+.home-promo-dialog form { position: absolute; top: 6px; right: 8px; }
+.home-promo-dialog form button { width: 32px; height: 32px; background: #252628; color: #fff; border: 0; border-radius: 50%; font-size: 24px; cursor: pointer; }
+
+@media (min-width: 700px) {
+  .app-shell.home-screen { height: min(860px, calc(100svh - 48px)); border-radius: 26px; border: 1px solid #343434; }
+}
+@media (max-width: 370px) {
+  .home-screen .hero-card { padding: 16px; height: 250px; }
+  .home-screen .hero-card h2 { font-size: 25px; }
+  .home-promo-caption { padding: 12px; gap: 8px; }
+  .home-screen .appointment-person { padding: 12px; gap: 8px; }
+  .home-screen .appointment-person strong { font-size: 12px; }
+  .home-screen .appointment-person em { font-size: 8px; padding: 5px 6px; }
+  .home-screen .appointment-time { margin: 0 12px 12px; padding: 9px; font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-promo-track, .home-carousel-dots span, .home-screen .hero-card strong { transition: none; }
+}
