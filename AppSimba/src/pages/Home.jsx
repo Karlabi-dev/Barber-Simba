@@ -11,6 +11,7 @@ import barbershop from '../assets/home/barbershop.png'
 import promoBaboon from '../assets/home/promo-baboon.png'
 import promoQueen from '../assets/home/promo-queen.png'
 import promoLightHair from '../assets/home/promo-light-hair.png'
+import { useAuth } from '../hooks/useAuth'
 import './Home.css'
 
 const promotions = [
@@ -20,6 +21,8 @@ const promotions = [
 ]
 
 export default function Home() {
+  const { usuario } = useAuth()
+  const firstName = usuario?.displayName?.trim().split(/\s+/)[0]
   const [promotion, setPromotion] = useState(0)
   const [paused, setPaused] = useState(false)
   const [interacting, setInteracting] = useState(false)
@@ -47,7 +50,7 @@ export default function Home() {
   }
 
   return <AppShell className="home-screen"><Header />
-    <section className="greeting"><h1>Olá, Guilherme</h1><p>Seja bem-vindo de volta à experiência SIMBA.</p></section>
+    <section className="greeting"><h1>{firstName ? `Olá, ${firstName}` : 'Olá!'}</h1><p>Seja bem-vindo de volta à experiência SIMBA.</p></section>
     <Link className="hero-card" to="/servicos" aria-label="Agendar horário: escolher serviço" style={{ '--hero-image': `url(${barbershop})` }}>
       <div className="home-hero-copy">
         <h2>Agendar horário</h2>
