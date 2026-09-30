@@ -25,6 +25,20 @@ export function createAuthService({ auth, ready, sdk }) {
       await ensureReady()
       return (await sdk.signInWithEmailAndPassword(auth, email.trim(), senha)).user
     },
+    async atualizarPerfil(user, data) {
+      await ensureReady()
+      await sdk.updateProfile(user, data)
+      return user
+    },
+    async alterarEmail(user, email) {
+      await ensureReady()
+      await sdk.updateEmail(user, email.trim())
+      return user
+    },
+    async alterarSenha(user, senha) {
+      await ensureReady()
+      await sdk.updatePassword(user, senha)
+    },
     async sair() {
       // Permitir logout mesmo se a configuração de persistência falhar.
       await sdk.signOut(auth)
