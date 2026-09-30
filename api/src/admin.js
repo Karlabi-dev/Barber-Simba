@@ -187,6 +187,19 @@ export function createAdminRouter(query) {
         response.json(rows[0])
       } catch (error) { catalogError(error, next, response) }
     })
+
+    router.delete(`/${table}/:id`, async (request, response, next) => {
+      if (!uuid.test(request.params.id)) return response.status(400).json({ error: 'Identificador inválido.' })
+      try {
+        const { rows } = await query(`DELETE FROM ${table} WHERE id = $1 RETURNING id`, [request.params.id])
+        if (!rows.length) return response.status(404).json({ error: 'Cadastro não encontrado.' })
+        response.json({ id: rows[0].id, excluido: true })
+      } catch (error) {
+        if (error.code === '23503')
+          return response.status(409).json({ error: 'Este cadastro possui agendamentos e não pode ser excluído. Desative-o para preservar o histórico.' })
+        next(error)
+      }
+    })
   }
 
   return router

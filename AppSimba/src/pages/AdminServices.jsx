@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import AdminPage from '../components/AdminPage'
 import { useAuth } from '../hooks/useAuth'
-import { loadAdminServices, saveAdminService } from '../services/admin'
+import { loadAdminServices, saveAdminService, deleteAdminService } from '../services/admin'
 import { decimalPrice, formatPrice, slugFromName } from '../services/adminForm'
 import './AdminCatalog.css'
 
@@ -77,6 +77,18 @@ export default function AdminServices() {
     finally { setChanging(null) }
   }
 
+  async function remove(item) {
+    if (changing || !window.confirm(`Excluir o serviço “${item.nome}” permanentemente? Essa ação não pode ser desfeita.`)) return
+    setChanging(item.id)
+    setListError('')
+    try {
+      await deleteAdminService(usuario, item.id)
+      setItems(current => current.filter(row => row.id !== item.id))
+      if (editing === item.id) { setForm(null); setEditing(null) }
+    } catch (cause) { setListError(cause.message) }
+    finally { setChanging(null) }
+  }
+
   return <AdminPage title="SERVIÇOS" onAdd={() => begin()}>
     <p className="admin-intro">Catálogo de serviços da barbearia</p>
     {loading && <p className="admin-feedback" role="status">Carregando serviços...</p>}
@@ -84,7 +96,7 @@ export default function AdminServices() {
     {!loading && !listError && items.length === 0 && <p className="admin-feedback">Nenhum serviço cadastrado.</p>}
     <div className="admin-catalog-list">{items.map(item => <article key={item.id} className="admin-catalog-card">
       <div className="admin-catalog-copy"><strong>{item.nome}</strong><span>{item.duracao} min · {formatPrice(item.preco)}</span><small>{item.categoria} · {item.ativo ? 'Ativo' : 'Inativo'}</small></div>
-      <div className="admin-catalog-actions"><button type="button" onClick={() => begin(item)} aria-label={`Editar ${item.nome}`}>Editar</button><button type="button" disabled={changing === item.id} onClick={() => toggle(item)}>{item.ativo ? 'Desativar' : 'Ativar'}</button></div>
+      <div className="admin-catalog-actions"><button type="button" disabled={changing === item.id} onClick={() => begin(item)} aria-label={`Editar ${item.nome}`}>Editar</button><button className="admin-toggle" type="button" disabled={changing === item.id} onClick={() => toggle(item)}>{item.ativo ? 'Desativar' : 'Ativar'}</button><button className="admin-delete" type="button" disabled={changing === item.id} onClick={() => remove(item)} aria-label={`Excluir ${item.nome}`}>Excluir</button></div>
     </article>)}</div>
 
     {form && <section className="admin-form-panel" aria-labelledby="admin-service-form-title">

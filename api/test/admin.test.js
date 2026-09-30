@@ -107,3 +107,35 @@ test('catálogo valida entradas, usa parâmetros e permite desativação sem apa
     })).status, 201)
   } finally { await close() }
 })
+
+test('exclusão administrativa preserva cadastros ligados a agendamentos', async () => {
+  const calls = []
+  let outcome = 'deleted'
+  const { base, close } = await serve(async (sql, params) => {
+    calls.push({ sql, params })
+    if (outcome === 'booked') throw Object.assign(new Error('referenced'), { code: '23503' })
+    return { rows: outcome === 'missing' ? [] : [{ id }] }
+  })
+  try {
+    const service = `${base}/api/admin/services/${id}`
+    const professional = `${base}/api/admin/professionals/${id}`
+    assert.equal((await fetch(service, { method: 'DELETE', headers: headers('user') })).status, 403)
+    assert.equal((await fetch(`${base}/api/admin/services/invalido`, { method: 'DELETE', headers: headers('admin') })).status, 400)
+    assert.equal(calls.length, 0)
+
+    const removed = await fetch(service, { method: 'DELETE', headers: headers('admin') })
+    assert.equal(removed.status, 200)
+    assert.deepEqual(await removed.json(), { id, excluido: true })
+    assert.match(calls[0].sql, /^DELETE FROM services WHERE id = \$1 RETURNING id$/)
+    assert.deepEqual(calls[0].params, [id])
+
+    outcome = 'booked'
+    const blocked = await fetch(professional, { method: 'DELETE', headers: headers('admin') })
+    assert.equal(blocked.status, 409)
+    assert.match((await blocked.json()).error, /agendamentos.*Desative/)
+    assert.match(calls[1].sql, /^DELETE FROM professionals WHERE id = \$1 RETURNING id$/)
+
+    outcome = 'missing'
+    assert.equal((await fetch(professional, { method: 'DELETE', headers: headers('admin') })).status, 404)
+  } finally { await close() }
+})

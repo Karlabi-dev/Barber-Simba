@@ -8,7 +8,8 @@
 .admin-catalog-copy strong span.admin-inactive { color: #db9a9a; }
 .admin-catalog-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .admin-catalog-actions button, .admin-catalog-actions a { border: 0; border-radius: 6px; padding: 7px 8px; text-align: center; color: #e5c158; background: #59010c; font-size: 9px; cursor: pointer; }
-.admin-catalog-actions button:last-child { color: #bdbdbd; background: #27282a; }
+.admin-catalog-actions .admin-toggle { color: #bdbdbd; background: #27282a; }
+.admin-catalog-actions .admin-delete { color: #ffb2b2; background: #3d2024; }
 .admin-catalog-actions button:disabled { opacity: .6; cursor: wait; }
 .admin-team-avatar { width: 40px; height: 40px; flex-shrink: 0; border: 1px solid #e5c158; border-radius: 50%; background: #333; object-fit: cover; }
 .admin-form-panel { margin: 20px -14px -40px; padding: 16px 14px 40px; background: #18191b; border-radius: 20px 20px 0 0; }

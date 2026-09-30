@@ -26,11 +26,15 @@ export const loadAdminServices = (user, signal) => adminRequest(user, '/services
 export const saveAdminService = (user, service, id) => adminRequest(user,
   id ? `/services/${encodeURIComponent(id)}` : '/services',
   { method: id ? 'PATCH' : 'POST', body: service })
+export const deleteAdminService = (user, id) => adminRequest(user,
+  `/services/${encodeURIComponent(id)}`, { method: 'DELETE' })
 
 export const loadAdminProfessionals = (user, signal) => adminRequest(user, '/professionals', { signal })
 export const saveAdminProfessional = (user, professional, id) => adminRequest(user,
   id ? `/professionals/${encodeURIComponent(id)}` : '/professionals',
   { method: id ? 'PATCH' : 'POST', body: professional })
+export const deleteAdminProfessional = (user, id) => adminRequest(user,
+  `/professionals/${encodeURIComponent(id)}`, { method: 'DELETE' })
 
 export const loadAdminHours = (user, id, signal) => adminRequest(user,
   `/professionals/${encodeURIComponent(id)}/hours`, { signal })

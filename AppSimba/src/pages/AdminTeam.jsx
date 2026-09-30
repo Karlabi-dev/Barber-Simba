@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom'
 import AdminPage from '../components/AdminPage'
 import { useAuth } from '../hooks/useAuth'
-import { loadAdminHours, loadAdminProfessionals, saveAdminProfessional, saveAdminHours, deleteAdminHours } from '../services/admin'
+import { loadAdminHours, loadAdminProfessionals, saveAdminProfessional, saveAdminHours, deleteAdminHours, deleteAdminProfessional } from '../services/admin'
 import { slugFromName } from '../services/adminForm'
 import profileIcon from '../assets/icons/perfil.png'
 import allander from '../assets/allander.png'
@@ -46,6 +46,17 @@ export function AdminTeam() {
     finally { setChanging(null) }
   }
 
+  async function remove(item) {
+    if (changing || !window.confirm(`Excluir o profissional “${item.nome}” permanentemente? Essa ação não pode ser desfeita.`)) return
+    setChanging(item.id)
+    setError('')
+    try {
+      await deleteAdminProfessional(usuario, item.id)
+      setItems(current => current.filter(row => row.id !== item.id))
+    } catch (cause) { setError(cause.message) }
+    finally { setChanging(null) }
+  }
+
   return <AdminPage title="EQUIPE" onAdd={() => navigate('/admin/equipe/novo')}>
     <p className="admin-intro">Profissionais e horários de atendimento</p>
     {loading && <p className="admin-feedback" role="status">Carregando equipe...</p>}
@@ -54,7 +65,7 @@ export function AdminTeam() {
     <div className="admin-catalog-list">{items.map(item => <article key={item.id} className="admin-catalog-card">
       <img className="admin-team-avatar" src={item.imageKey === 'allander' ? allander : profileIcon} alt="" />
       <div className="admin-catalog-copy"><strong>{item.nome} <span className={item.ativo ? 'admin-active' : 'admin-inactive'}>{item.ativo ? 'Ativo' : 'Inativo'}</span></strong><span>{item.especialidade || 'Especialidade não informada'}</span><small>{item.dias ? item.dias.split('/').join(', ') : 'Sem horários cadastrados'}</small></div>
-      <div className="admin-catalog-actions"><Link to={`/admin/equipe/${item.id}`} aria-label={`Editar ${item.nome}`}>Editar</Link><button type="button" disabled={changing === item.id} onClick={() => toggle(item)}>{item.ativo ? 'Desativar' : 'Ativar'}</button></div>
+      <div className="admin-catalog-actions"><Link to={`/admin/equipe/${item.id}`} aria-label={`Editar ${item.nome}`}>Editar</Link><button className="admin-toggle" type="button" disabled={changing === item.id} onClick={() => toggle(item)}>{item.ativo ? 'Desativar' : 'Ativar'}</button><button className="admin-delete" type="button" disabled={changing === item.id} onClick={() => remove(item)} aria-label={`Excluir ${item.nome}`}>Excluir</button></div>
     </article>)}</div>
   </AdminPage>
 }

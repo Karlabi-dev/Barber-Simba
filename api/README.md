@@ -47,7 +47,7 @@ Não envie o arquivo `.env` nem a URL do banco ao GitHub. As migrações usam a 
 
 ## Painel e API administrativa
 
-O mesmo login do AppSimba abre `/admin` quando o token Firebase contém `admin: true`. O painel inicial mostra o resumo de hoje e os atendimentos de hoje, futuros e do histórico. As telas `/admin/servicos` e `/admin/equipe` permitem cadastrar, editar e desativar os registros, além de configurar os horários por dia de cada profissional. Contas comuns seguem para `/home`. O cadastro da equipe cria o perfil no catálogo, mas ainda não concede login de profissional; essa área está reservada para uma etapa posterior. Novas fotos também exigem uma solução de armazenamento, por isso o formulário usa o avatar padrão.
+O mesmo login do AppSimba abre `/admin` quando o token Firebase contém `admin: true`. O painel inicial mostra o resumo de hoje e os atendimentos de hoje, futuros e do histórico. As telas `/admin/servicos` e `/admin/equipe` permitem cadastrar, editar, desativar e excluir os registros, além de configurar os horários por dia de cada profissional. A exclusão permanente pede confirmação e só funciona se não houver agendamentos vinculados, inclusive antigos ou cancelados; nesse caso, use Desativar para preservar o histórico. Contas comuns seguem para `/home`. O cadastro da equipe cria o perfil no catálogo, mas ainda não concede login de profissional; essa área está reservada para uma etapa posterior. Novas fotos também exigem uma solução de armazenamento, por isso o formulário usa o avatar padrão.
 
 Todas as rotas `/api/admin/*` exigem `Authorization: Bearer <Firebase ID token>` de uma conta cujo token tenha a **custom claim booleana `admin: true`**. Uma conta autenticada sem essa permissão recebe 403; sem token válido, recebe 401. A permissão é conferida pela API com Firebase Admin, não pelo navegador, e não existe rota HTTP para concedê-la.
 
@@ -59,6 +59,7 @@ Todas as rotas `/api/admin/*` exigem `Authorization: Bearer <Firebase ID token>`
 | `GET /api/admin/services` e `GET /api/admin/professionals` | Lista todo o catálogo, inclusive registros inativos. |
 | `POST /api/admin/services` e `POST /api/admin/professionals` | Cadastra registros. Serviços exigem `slug`, `nome`, `categoria`, `preco` (texto decimal, por exemplo `"45.00"`) e `duracao` (minutos); profissionais exigem `slug` e `nome`. |
 | `PATCH /api/admin/services/:id` e `PATCH /api/admin/professionals/:id` | Atualiza somente os campos enviados. Use `{ "ativo": false }` para retirar do catálogo público sem apagar agendamentos anteriores. |
+| `DELETE /api/admin/services/:id` e `DELETE /api/admin/professionals/:id` | Exclui um cadastro sem agendamentos vinculados; retorna 409 se houver histórico, 404 se não existir. Ao excluir um profissional, seus horários semanais também são removidos. |
 | `GET /api/admin/professionals/:id/hours` | Consulta os dias e horários configurados para um profissional. |
 | `PUT /api/admin/professionals/:id/hours/:weekday` | Define abertura e fechamento de um dia, por exemplo `{ "abertura": "08:00", "fechamento": "18:00" }`. Dias ISO: segunda `1` até domingo `7`. |
 | `DELETE /api/admin/professionals/:id/hours/:weekday` | Fecha aquele dia para novos agendamentos; reservas anteriores permanecem registradas. |
