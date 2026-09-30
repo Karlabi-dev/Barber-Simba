@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { minutes, scheduleDays, validTime } from './availability.js'
 
 const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -28,12 +29,12 @@ const specs = {
       nome: [shortText, 'nome'],
       especialidade: [value => optionalText(value, 200), 'especialidade'],
       avaliacao: [value => value === null || (typeof value === 'string' && /^(?:[0-4](?:\.\d)?|5(?:\.0)?)$/.test(value)), 'avaliacao'],
-      dias: [value => optionalText(value, 200), 'dias'],
       imageKey: [shortText, 'image_key'],
       ordem: [order, 'ordem'],
       ativo: [value => typeof value === 'boolean', 'ativo']
     },
-    projection: 'id, slug, nome, especialidade, avaliacao::text AS avaliacao, dias, image_key AS "imageKey", ordem, ativo'
+    projection: `id, slug, nome, especialidade, avaliacao::text AS avaliacao,
+      COALESCE(${scheduleDays}, '') AS dias, image_key AS "imageKey", ordem, ativo`
   }
 }
 
@@ -83,6 +84,48 @@ export function createAdminRouter(query) {
         WHERE id = $1 AND status = 'confirmado' RETURNING id, status`, [request.params.id, status])
       if (!rows.length) return response.status(404).json({ error: 'Agendamento não encontrado ou já encerrado.' })
       response.json(rows[0])
+    } catch (error) { next(error) }
+  })
+
+  router.get('/professionals/:id/hours', async (request, response, next) => {
+    if (!uuid.test(request.params.id)) return response.status(400).json({ error: 'Profissional inválido.' })
+    try {
+      const professional = await query('SELECT id FROM professionals WHERE id = $1', [request.params.id])
+      if (!professional.rows.length) return response.status(404).json({ error: 'Profissional não encontrado.' })
+      const { rows } = await query(`SELECT weekday AS dia, to_char(opens_at, 'HH24:MI') AS abertura,
+        to_char(closes_at, 'HH24:MI') AS fechamento
+        FROM professional_hours WHERE professional_id = $1 ORDER BY weekday`, [request.params.id])
+      response.json(rows)
+    } catch (error) { next(error) }
+  })
+
+  router.put('/professionals/:id/hours/:weekday', async (request, response, next) => {
+    const { abertura, fechamento } = request.body || {}
+    if (!uuid.test(request.params.id) || !/^[1-7]$/.test(request.params.weekday) ||
+        !validTime(abertura) || !validTime(fechamento) || minutes(abertura) >= minutes(fechamento) ||
+        Object.keys(request.body || {}).length !== 2)
+      return response.status(400).json({ error: 'Confira o dia e os horários de abertura e fechamento.' })
+    try {
+      const { rows } = await query(`INSERT INTO professional_hours (professional_id, weekday, opens_at, closes_at)
+        SELECT id, $2, $3::time, $4::time FROM professionals WHERE id = $1
+        ON CONFLICT (professional_id, weekday) DO UPDATE
+          SET opens_at = EXCLUDED.opens_at, closes_at = EXCLUDED.closes_at
+        RETURNING weekday AS dia, to_char(opens_at, 'HH24:MI') AS abertura,
+          to_char(closes_at, 'HH24:MI') AS fechamento`,
+      [request.params.id, Number(request.params.weekday), abertura, fechamento])
+      if (!rows.length) return response.status(404).json({ error: 'Profissional não encontrado.' })
+      response.json(rows[0])
+    } catch (error) { next(error) }
+  })
+
+  router.delete('/professionals/:id/hours/:weekday', async (request, response, next) => {
+    if (!uuid.test(request.params.id) || !/^[1-7]$/.test(request.params.weekday))
+      return response.status(400).json({ error: 'Profissional ou dia inválido.' })
+    try {
+      const { rows } = await query(`DELETE FROM professional_hours WHERE professional_id = $1 AND weekday = $2
+        RETURNING weekday AS dia`, [request.params.id, Number(request.params.weekday)])
+      if (!rows.length) return response.status(404).json({ error: 'Horário não encontrado.' })
+      response.json({ dia: rows[0].dia, removido: true })
     } catch (error) { next(error) }
   })
 
