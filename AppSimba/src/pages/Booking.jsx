@@ -17,9 +17,12 @@ export default function Booking() {
   const [params] = useSearchParams()
   const [draft, setDraft] = useState(() => {
     const saved = readBooking()
+    const isPreviousBooking = saved?.confirmado
     return { servico: params.get('servico') || saved?.servico || services[0].nome,
       profissional: params.get('profissional') || saved?.profissional || barbeiros[0].nome,
-      data: saved?.data || '', horario: saved?.horario || '', observacoes: saved?.observacoes || '' }
+      data: isPreviousBooking ? '' : saved?.data || '',
+      horario: isPreviousBooking ? '' : saved?.horario || '',
+      observacoes: isPreviousBooking ? '' : saved?.observacoes || '' }
   })
   useEffect(() => {
     if (!useNeon) return
