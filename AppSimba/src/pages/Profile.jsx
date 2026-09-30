@@ -12,7 +12,7 @@ function readProfile() {
 }
 
 export default function Profile() {
-  const { usuario, atualizarPerfil, alterarEmail, alterarSenha, sair } = useAuth()
+  const { usuario, atualizarPerfil, alterarEmail, alterarSenha } = useAuth()
   const [tab, setTab] = useState('dados')
   const [profile, setProfile] = useState(readProfile)
   const [email, setEmail] = useState(usuario?.email || 'guilherme@gmail.com')
