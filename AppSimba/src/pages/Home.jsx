@@ -26,6 +26,8 @@ export default function Home() {
   const [expanded, setExpanded] = useState(null)
   const dialog = useRef(null)
   const running = !paused && !interacting && expanded === null
+  const today = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
+    .format(new Date()).replace(' de ', ' ').replace('.', '')
 
   useEffect(() => {
     if (!running) return
@@ -47,11 +49,14 @@ export default function Home() {
   return <AppShell className="home-screen"><Header />
     <section className="greeting"><h1>Olá, Guilherme</h1><p>Seja bem-vindo de volta à experiência SIMBA.</p></section>
     <Link className="hero-card" to="/servicos" aria-label="Agendar horário: escolher serviço" style={{ '--hero-image': `url(${barbershop})` }}>
-      <span className="home-hero-badge">EXPERIÊNCIA SIMBA</span>
       <div className="home-hero-copy">
-        <h2>Seu estilo.<br />Seu momento.</h2>
-        <p>Escolha seu serviço e agende com quem entende do seu visual.</p>
-        <strong>Agendar horário <span aria-hidden="true">↗</span></strong>
+        <h2>Agendar horário</h2>
+        <p>Escolha seu serviço e garanta seu momento de autocuidado com nossos especialistas.</p>
+        <div className="hero-options">
+          <span><img src={calendarIcon} alt="" />Hoje, {today}</span>
+          <span><img src={clockIcon} alt="" />Qualquer hora</span>
+        </div>
+        <strong>INICIAR AGENDAMENTO</strong>
       </div>
     </Link>
 

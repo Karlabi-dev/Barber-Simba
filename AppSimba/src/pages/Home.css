@@ -9,6 +9,7 @@
 .home-screen .screen-content {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
@@ -32,45 +33,38 @@
 .home-screen .greeting p { font-size: 11px; line-height: 1.5; }
 
 .home-screen .hero-card {
-  height: 260px;
-  padding: 20px;
+  height: auto;
+  min-height: 227px;
+  padding: 20px 18px 18px;
   border-radius: 20px;
   border: 1px solid #e5c15855;
-  background-image: linear-gradient(180deg, #090a0b12 0%, #090a0b38 28%, #090a0bc9 60%, #090a0bf5 100%), var(--hero-image);
+  background-image: linear-gradient(90deg, #090a0bdb, #090a0b99), var(--hero-image);
   background-size: cover;
   background-position: center 45%;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   box-shadow: 0 12px 32px #0003;
 }
 
-.home-screen .home-hero-badge {
-  align-self: flex-start;
-  padding: 7px 10px;
-  border: 1px solid #ffffff2e;
-  border-radius: 30px;
-  background: #0e0f1099;
-  color: #fff;
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 1.4px;
-}
-
 .home-screen .home-hero-copy { width: 100%; }
-.home-screen .hero-card h2 { color: #fff; font-size: 27px; line-height: 1.08; letter-spacing: -.8px; margin: 0 0 8px; }
-.home-screen .hero-card p { color: #e0dcd6; font-size: 11px; line-height: 1.5; max-width: 265px; margin: 0 0 15px; }
+.home-screen .hero-card h2 { color: var(--gold); font-size: 19px; line-height: 1.2; letter-spacing: -.3px; margin: 0 0 7px; }
+.home-screen .hero-card p { color: #bcbab7; font-size: 12px; line-height: 1.45; max-width: none; margin: 0 0 18px; }
+.home-screen .hero-options { display: flex; gap: 12px; margin-bottom: 18px; }
+.home-screen .hero-options span { display: flex; align-items: center; gap: 7px; min-width: 0; min-height: 37px; padding: 9px 11px; color: #fff; background: #242729; border-radius: 11px; font-size: 10px; letter-spacing: 0; }
+.home-screen .hero-options img { position: static; width: 15px; height: 15px; flex-shrink: 0; object-fit: contain; filter: brightness(0) saturate(100%) invert(83%) sepia(47%) saturate(591%) hue-rotate(4deg) brightness(98%) contrast(87%); }
 .home-screen .hero-card strong {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 13px 16px;
-  min-height: 44px;
-  border-radius: 11px;
+  justify-content: center;
+  padding: 15px 12px;
+  min-height: 48px;
+  border-radius: 13px;
   font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 5px 18px #e5c15820;
   letter-spacing: 0;
   transition: background .2s;
 }
-.home-screen .hero-card strong span { color: #101112; font-size: 19px; line-height: 1; }
 .home-screen .hero-card:hover strong { background: #f0d37e; }
 
 .home-promotions { margin-top: 26px; }
@@ -92,8 +86,8 @@
 .home-carousel-pause { font-size: 15px; }
 .home-carousel-pause[aria-pressed="true"] { color: var(--gold); border-color: #e5c15866; }
 .home-promo-window { overflow: hidden; border-radius: 18px; border: 1px solid var(--line); background: #080808; }
-.home-promo-track { display: flex; transition: transform .55s cubic-bezier(.22,.61,.36,1); }
-.home-promo-slide { flex: 0 0 100%; min-width: 0; }
+.home-promo-track { display: flex; width: 100%; transition: transform .55s cubic-bezier(.22,.61,.36,1); }
+.home-promo-slide { flex: 0 0 100%; width: 100%; min-width: 0; max-width: 100%; }
 .home-promo-art {
   display: block;
   position: relative;
@@ -105,7 +99,7 @@
   background: #080808;
   cursor: zoom-in;
 }
-.home-promo-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.home-promo-art img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
 .home-promo-expand { position: absolute; bottom: 10px; right: 10px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; color: #fff; background: #0009; font-size: 20px; }
 .home-promo-caption { min-height: 72px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #ffffff0d; background: #191a1c; }
 .home-promo-caption > div { min-width: 0; }
@@ -137,8 +131,10 @@
   .app-shell.home-screen { height: min(860px, calc(100svh - 48px)); border-radius: 26px; border: 1px solid #343434; }
 }
 @media (max-width: 370px) {
-  .home-screen .hero-card { padding: 16px; height: 250px; }
-  .home-screen .hero-card h2 { font-size: 25px; }
+  .home-screen .hero-card { padding: 18px 14px; }
+  .home-screen .hero-card h2 { font-size: 18px; }
+  .home-screen .hero-options { gap: 8px; }
+  .home-screen .hero-options span { padding-inline: 9px; font-size: 9px; }
   .home-promo-caption { padding: 12px; gap: 8px; }
   .home-screen .appointment-person { padding: 12px; gap: 8px; }
   .home-screen .appointment-person strong { font-size: 12px; }
