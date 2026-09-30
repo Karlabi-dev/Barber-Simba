@@ -21,10 +21,11 @@ export default function Booking() {
   const [draft, setDraft] = useState(() => {
     const saved = readBooking()
     const isPreviousBooking = saved?.confirmado
-    return { servico: params.get('servico') || saved?.servico || services[0].nome,
+    const choosingProfessional = params.has('profissional') && !params.has('servico')
+    return { servico: params.get('servico') || (choosingProfessional || isPreviousBooking ? '' : saved?.servico || ''),
       profissional: params.get('profissional') || saved?.profissional || barbeiros[0].nome,
-      data: isPreviousBooking ? '' : saved?.data || '',
-      horario: isPreviousBooking ? '' : saved?.horario || '',
+      data: choosingProfessional || isPreviousBooking ? '' : saved?.data || '',
+      horario: choosingProfessional || isPreviousBooking ? '' : saved?.horario || '',
       observacoes: isPreviousBooking ? '' : saved?.observacoes || '' }
   })
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function Booking() {
       .catch(cause => { if (cause.name !== 'AbortError') setCatalogError(cause.message) })
     return () => controller.abort()
   }, [useNeon])
-  const service = serviceCatalog.find(item => item.nome === draft.servico) || serviceCatalog[0]
+  const service = serviceCatalog.find(item => item.nome === draft.servico)
   const person = professionals.find(item => item.nome === draft.profissional) || professionals[0]
   const serviceSlug = service?.slug
   const professionalSlug = person?.slug
@@ -57,18 +58,22 @@ export default function Booking() {
   const selectedTime = useNeon && !horarios.includes(draft.horario) ? '' : draft.horario
   const change = event => {
     const { name, value } = event.target
-    if (name === 'data' || name === 'profissional') setAvailability(null)
+    if (name === 'data' || name === 'profissional' || name === 'servico') setAvailability(null)
     setDraft(current => ({ ...current, [name]: value,
-      ...((name === 'data' || name === 'profissional') ? { horario: '' } : {}) }))
+      ...((name === 'data' || name === 'profissional' || name === 'servico') ? { horario: '' } : {}) }))
   }
   const retry = () => { setAvailability(null); setRetryAvailability(value => value + 1) }
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Fortaleza', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
-  return <AppShell><Header title="Agendamento" compact backTo="/servicos" />
+  return <AppShell><Header title="Agendamento" compact backTo={params.has('profissional') && !params.has('servico') ? '/profissionais' : '/servicos'} />
     <p className="subtitle">Escolha os detalhes para reservar seu horário</p>
     {catalogError && <p role="alert">{catalogError}</p>}
-    {useNeon && (!service || !person) && !catalogError && <p role="status">Carregando serviços e profissionais...</p>}
-    {service && person && <form className="booking-form" onSubmit={event => { event.preventDefault(); if (useNeon && (!currentAvailability || !selectedTime)) return; saveBooking({...draft, horario: selectedTime, servico: service.nome, profissional: person.nome, serviceSlug: service.slug, professionalSlug: person.slug}); navigate('/confirmar-agendamento') }}>
-      <article className="selected-service"><span><img src={service.icon} alt="" /></span><div><strong>{service.nome}</strong><small>{service.duracao} min • Serviço selecionado</small></div><b>R$ {service.preco}</b></article>
+    {useNeon && (!serviceCatalog.length || !person) && !catalogError && <p role="status">Carregando serviços e profissionais...</p>}
+    {serviceCatalog.length > 0 && person && <form className="booking-form" onSubmit={event => { event.preventDefault(); if (!service || (useNeon && (!currentAvailability || !selectedTime))) return; saveBooking({...draft, horario: selectedTime, servico: service.nome, profissional: person.nome, serviceSlug: service.slug, professionalSlug: person.slug}); navigate('/confirmar-agendamento') }}>
+      <label>Serviço<select name="servico" value={service?.nome || ''} onChange={change} required>
+        <option value="">Escolha um serviço</option>
+        {serviceCatalog.map(item => <option key={item.id || item.nome} value={item.nome}>{item.nome}</option>)}
+      </select></label>
+      {service && <article className="selected-service"><span><img src={service.icon} alt="" /></span><div><strong>{service.nome}</strong><small>{service.duracao} min • Serviço selecionado</small></div><b>R$ {service.preco}</b></article>}
       <label>Profissional<select name="profissional" value={draft.profissional || person.nome} onChange={change} required>{professionals.map(item => <option key={item.id || item.nome}>{item.nome}</option>)}</select></label>
       <div className="field-row"><label>Data<input name="data" type="date" min={today} value={draft.data} onChange={change} required /></label>
         <label>Horário{useNeon
@@ -80,8 +85,8 @@ export default function Booking() {
       {useNeon && currentAvailability?.error && <p className="availability-message" role="alert">{currentAvailability.error} <button type="button" onClick={retry}>Tentar novamente</button></p>}
       {useNeon && currentAvailability && !currentAvailability.error && !horarios.length && <p className="availability-message" role="status">Não há horários livres nessa data. Escolha outra data ou profissional.</p>}
       <label>Observações (opcional)<textarea name="observacoes" maxLength={500} value={draft.observacoes} onChange={change} placeholder="Ex.: preferência de corte, alergias..." /></label>
-      <div className="booking-summary"><span><small>Total</small><strong>{service.nome}</strong></span><b>R$ {service.preco}</b></div>
-      <Button type="submit" disabled={useNeon && (!currentAvailability || !!currentAvailability.error || !selectedTime)}>CONFIRMAR AGENDAMENTO</Button>
+      <div className="booking-summary"><span><small>Total</small><strong>{service?.nome || 'Escolha um serviço'}</strong></span><b>{service ? `R$ ${service.preco}` : '—'}</b></div>
+      <Button type="submit" disabled={!service || (useNeon && (!currentAvailability || !!currentAvailability.error || !selectedTime))}>CONFIRMAR AGENDAMENTO</Button>
     </form>}
   </AppShell>
 }
