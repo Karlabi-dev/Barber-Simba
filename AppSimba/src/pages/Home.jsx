@@ -11,6 +11,10 @@ import barbershop from '../assets/home/barbershop.png'
 import promoBaboon from '../assets/home/promo-baboon.png'
 import promoQueen from '../assets/home/promo-queen.png'
 import promoLightHair from '../assets/home/promo-light-hair.png'
+import { useAuth } from '../hooks/useAuth'
+import { listBookings } from '../services/bookings'
+import { readBookingHistory } from '../data/booking'
+import { nextBooking, bookingDateLabel } from '../services/nextBooking'
 import './Home.css'
 
 const promotions = [
@@ -20,6 +24,12 @@ const promotions = [
 ]
 
 export default function Home() {
+  const useNeon = import.meta.env.VITE_USE_NEON === 'true'
+  const { usuario, carregando } = useAuth()
+  const firstName = usuario?.displayName?.trim().split(/\s+/)[0]
+  const [bookingState, setBookingState] = useState({ uid: null, items: [], error: '' })
+  const [bookingRetry, setBookingRetry] = useState(0)
+  const [clock, setClock] = useState(() => new Date())
   const [promotion, setPromotion] = useState(0)
   const [paused, setPaused] = useState(false)
   const [interacting, setInteracting] = useState(false)
@@ -28,6 +38,27 @@ export default function Home() {
   const running = !paused && !interacting && expanded === null
   const today = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
     .format(new Date()).replace(' de ', ' ').replace('.', '')
+  const currentBookings = useNeon
+    ? bookingState.uid === usuario?.uid ? bookingState.items : []
+    : readBookingHistory()
+  const upcoming = !useNeon || usuario ? nextBooking(currentBookings, clock) : null
+  const loadingBooking = useNeon && (carregando || (usuario && bookingState.uid !== usuario.uid))
+  const bookingError = bookingState.uid === usuario?.uid ? bookingState.error : ''
+  const barber = upcoming && barbeiros.find(item => item.nome === upcoming.profissional)
+
+  useEffect(() => {
+    if (!useNeon || carregando || !usuario) return
+    let active = true
+    listBookings(usuario)
+      .then(items => { if (active) setBookingState({ uid: usuario.uid, items, error: '' }) })
+      .catch(cause => { if (active) setBookingState({ uid: usuario.uid, items: [], error: cause.message }) })
+    return () => { active = false }
+  }, [useNeon, carregando, usuario, bookingRetry])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setClock(new Date()), 60000)
+    return () => window.clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     if (!running) return
@@ -47,7 +78,7 @@ export default function Home() {
   }
 
   return <AppShell className="home-screen"><Header />
-    <section className="greeting"><h1>Olá, Guilherme</h1><p>Seja bem-vindo de volta à experiência SIMBA.</p></section>
+    <section className="greeting"><h1>{firstName ? `Olá, ${firstName}` : 'Olá!'}</h1><p>Seja bem-vindo de volta à experiência SIMBA.</p></section>
     <Link className="hero-card" to="/servicos" aria-label="Agendar horário: escolher serviço" style={{ '--hero-image': `url(${barbershop})` }}>
       <div className="home-hero-copy">
         <h2>Agendar horário</h2>
@@ -90,10 +121,17 @@ export default function Home() {
       <form method="dialog"><button type="submit" aria-label="Fechar promoção ampliada">×</button></form>
       {expanded !== null && <img src={promotions[expanded].image} alt={promotions[expanded].alt} />}
     </dialog>
-    <section className="section-block"><h2>Próximo Agendamento</h2><article className="appointment-card">
-      <div className="appointment-person"><img src={hero} alt="Thiago Silva" /><div><strong>Thiago Silva</strong><span>Corte Masculino & Barba</span></div><em>Confirmado</em></div>
-      <div className="appointment-time"><span><img src={calendarIcon} alt="" /> Amanhã, 19 Out</span><span><img src={clockIcon} alt="" /> 14:30 - 15:30</span></div>
-    </article></section>
+    <section className="section-block"><h2>Próximo Agendamento</h2>
+      {upcoming ? <article className="appointment-card">
+        <div className="appointment-person"><img className={!barber || barber.foto === hero ? 'appointment-placeholder' : ''} src={barber?.foto || hero} alt="" /><div><strong>{upcoming.profissional}</strong><span>{upcoming.servico}</span></div><em>Confirmado</em></div>
+        <div className="appointment-time"><span><img src={calendarIcon} alt="" /> <time dateTime={upcoming.data}>{bookingDateLabel(upcoming.data, clock)}</time></span><span><img src={clockIcon} alt="" /> <time dateTime={`${upcoming.data}T${upcoming.horario}`}>{upcoming.horario}</time></span></div>
+      </article> : <div className="appointment-card appointment-empty">
+        {loadingBooking ? <p role="status">Carregando seu próximo agendamento...</p>
+          : bookingError ? <><p role="alert">Não foi possível carregar seus agendamentos.</p><button type="button" onClick={() => setBookingRetry(value => value + 1)}>Tentar novamente</button></>
+            : useNeon && !usuario ? <><p>Entre na sua conta para ver seu próximo agendamento.</p><Link to="/login">Entrar</Link></>
+              : <><p>Você ainda não tem um agendamento futuro.</p><Link to="/servicos">Agendar horário</Link></>}
+      </div>}
+    </section>
     <section className="section-block professionals-preview"><div className="section-title"><h2>Profissionais</h2><Link to="/profissionais">Ver todos</Link></div><div className="barber-track">{[barbeiros[3], ...barbeiros.slice(0, 2)].map((barber) => <BarberCard key={barber.nome} {...barber} />)}</div></section>
   </AppShell>
 }

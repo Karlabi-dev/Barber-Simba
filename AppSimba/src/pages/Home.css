@@ -117,7 +117,12 @@
 .home-screen .section-block { margin-top: 24px; }
 .home-screen .section-block > h2, .home-screen .section-title h2 { font-size: 15px; margin-bottom: 12px; }
 .home-screen .appointment-person { padding: 14px; gap: 10px; }
+.home-screen .appointment-person .appointment-placeholder, .home-screen .appointment-time img { filter: brightness(0) saturate(100%) invert(83%) sepia(47%) saturate(591%) hue-rotate(4deg) brightness(98%) contrast(87%); }
 .home-screen .appointment-time { margin: 0 14px 14px; padding: 11px; }
+.home-screen .appointment-empty { padding: 18px; }
+.home-screen .appointment-empty p { margin: 0 0 12px; color: #b7b4b2; font-size: 12px; line-height: 1.5; }
+.home-screen .appointment-empty p:last-child { margin-bottom: 0; }
+.home-screen .appointment-empty a, .home-screen .appointment-empty button { display: inline-block; border: 0; border-radius: 9px; background: var(--gold); color: #151515; padding: 10px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .home-screen .barber-card { min-width: 124px; padding: 12px; }
 .home-screen .barber-avatar { width: 60px; height: 60px; }
 
