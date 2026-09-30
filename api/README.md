@@ -31,8 +31,15 @@ Sem `VITE_USE_NEON=true`, o app mantém o modo de demonstração. Com a opção 
 - `GET /api/bookings`: lista somente os agendamentos do usuário autenticado.
 - `POST /api/bookings`: recebe `serviceSlug`, `professionalSlug`, `data` (AAAA-MM-DD), `horario` (HH:MM) e `observacoes` opcional. Retorna 409 se o profissional já tiver reserva nesse horário.
 - `PATCH /api/bookings/:id/cancel`: cancela somente um agendamento confirmado do próprio usuário.
+- `GET /api/availability?serviceSlug=corte-premium&professionalSlug=allander&data=2026-10-05`: retorna `{ "data": "2026-10-05", "horarios": ["08:00", "08:30", ...] }` para a data escolhida; não exige login.
 
-As três rotas exigem `Authorization: Bearer <Firebase ID token>`. A API verifica assinatura, validade e projeto do token com Firebase Admin (`FIREBASE_PROJECT_ID=barber-simba`); nunca recebe uma senha do Firebase. O horário é interpretado em `America/Fortaleza`. Avaliações e notificações continuam locais e não representam mensagens efetivamente enviadas.
+As três rotas de `/api/bookings` exigem `Authorization: Bearer <Firebase ID token>`; a disponibilidade é pública. A API verifica assinatura, validade e projeto do token com Firebase Admin (`FIREBASE_PROJECT_ID=barber-simba`); nunca recebe uma senha do Firebase. O horário é interpretado em `America/Fortaleza`. Avaliações e notificações continuam locais e não representam mensagens efetivamente enviadas.
+
+### Disponibilidade e duração
+
+A migração `003_availability.sql` configura inicialmente todos os profissionais de **segunda a sábado, 08:00–18:00**, e atualiza os quatro serviços para **30 minutos**. Os horários de início são gerados a cada 30 minutos (último início às 17:30 para um serviço de 30 minutos). Domingos ficam fechados. Os dias mostrados no catálogo público são calculados a partir da agenda, não do antigo campo ilustrativo `dias`.
+
+Reservas novas precisam começar em um desses intervalos, caber integralmente no expediente e não coincidir com outra reserva confirmada do mesmo profissional. O banco impõe a regra de sobreposição mesmo sob requisições simultâneas. Agendamentos anteriores mantêm sua duração original; por isso, a migração pode falhar se já houver dois agendamentos confirmados que se sobrepõem. Nesse caso, resolva o conflito na branch de desenvolvimento antes de repetir a migração. A tela atual do cliente ainda usa um campo livre de horário; a integração visual com a rota de disponibilidade virá em outra etapa.
 
 Não envie o arquivo `.env` nem a URL do banco ao GitHub. As migrações usam a conexão direta do Neon; as consultas usam a URL agrupada.
 
@@ -47,8 +54,11 @@ Todas as rotas `/api/admin/*` exigem `Authorization: Bearer <Firebase ID token>`
 | `GET /api/admin/services` e `GET /api/admin/professionals` | Lista todo o catálogo, inclusive registros inativos. |
 | `POST /api/admin/services` e `POST /api/admin/professionals` | Cadastra registros. Serviços exigem `slug`, `nome`, `categoria`, `preco` (texto decimal, por exemplo `"45.00"`) e `duracao` (minutos); profissionais exigem `slug` e `nome`. |
 | `PATCH /api/admin/services/:id` e `PATCH /api/admin/professionals/:id` | Atualiza somente os campos enviados. Use `{ "ativo": false }` para retirar do catálogo público sem apagar agendamentos anteriores. |
+| `GET /api/admin/professionals/:id/hours` | Consulta os dias e horários configurados para um profissional. |
+| `PUT /api/admin/professionals/:id/hours/:weekday` | Define abertura e fechamento de um dia, por exemplo `{ "abertura": "08:00", "fechamento": "18:00" }`. Dias ISO: segunda `1` até domingo `7`. |
+| `DELETE /api/admin/professionals/:id/hours/:weekday` | Fecha aquele dia para novos agendamentos; reservas anteriores permanecem registradas. |
 
-Os demais campos aceitos nos serviços são `descricao`, `iconKey`, `ordem` e `ativo`; nos profissionais são `especialidade`, `avaliacao` (texto decimal entre 0 e 5, ou `null`), `dias`, `imageKey`, `ordem` e `ativo`. `slug` usa letras minúsculas, números e hífens. IDs inválidos e dados fora dos limites retornam 400; `slug` repetido retorna 409.
+Os demais campos aceitos nos serviços são `descricao`, `iconKey`, `ordem` e `ativo`; nos profissionais são `especialidade`, `avaliacao` (texto decimal entre 0 e 5, ou `null`), `imageKey`, `ordem` e `ativo`. `dias` agora é calculado pela agenda semanal. Um profissional novo não recebe horários automaticamente: configure-os pelas rotas acima. `slug` usa letras minúsculas, números e hífens. IDs inválidos e dados fora dos limites retornam 400; `slug` repetido retorna 409.
 
 ### Conceder acesso a uma conta escolhida
 
