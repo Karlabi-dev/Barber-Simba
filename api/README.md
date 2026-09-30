@@ -8,10 +8,12 @@ Projeto `simba-barber` (`spring-smoke-73415339`), banco `neondb`:
 
 | Branch | Uso | Situação em 30/09/2026 |
 | --- | --- | --- |
-| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; esquema e catálogo aplicados. As URLs desta branch já estão no `api/.env` local de desenvolvimento. |
-| `production` | Futuro ambiente publicado | Branch padrão; migrações `001_initial.sql` e `002_seed_catalog.sql` aplicadas em 30/09/2026. São 4 serviços, 8 profissionais e 0 agendamentos. A API ainda não foi publicada. |
+| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; migrações `001`, `002` e `003_availability.sql` aplicadas. São 4 serviços de 30 minutos e 48 períodos semanais para 8 profissionais. As URLs desta branch já estão no `api/.env` local de desenvolvimento. |
+| `production` | Futuro ambiente publicado | Branch padrão; apenas as migrações `001_initial.sql` e `002_seed_catalog.sql` estão aplicadas. São 4 serviços, 8 profissionais e 0 agendamentos. **A migração `003` ainda não foi aplicada**; a API ainda não foi publicada. |
 
 Cada branch tem suas próprias URLs de conexão. Não use a URL de `production` no `.env` local ao testar agendamentos e novas telas. O arquivo `.env` contém credenciais e não deve ser enviado ao GitHub.
+
+O código da API com disponibilidade exige a migração `003` antes de atender agendamentos. Na `production`, aplique essa migração com a conexão direta somente após a autorização da mudança nesse ambiente.
 
 ## Configuração local
 
