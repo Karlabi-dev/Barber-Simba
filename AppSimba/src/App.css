@@ -130,6 +130,9 @@
 .review-actions .button-secondary { color: #334155; }
 .booking-form input, .booking-form select, .booking-form textarea { width: 100%; min-width: 0; }
 .booking-form { margin-bottom: 24px; }
+.availability-message { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.availability-message button { padding: 0; border: 0; background: none; color: var(--gold); text-decoration: underline; cursor: pointer; font: inherit; }
+.booking-form select:disabled, .booking-form .button:disabled { opacity: .55; cursor: not-allowed; }
 .rating { color: var(--gold); }
 .status-bar { color: #fff; }
 .success-screen { background: #000; }
