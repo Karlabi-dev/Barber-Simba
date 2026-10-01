@@ -1,6 +1,6 @@
 # Firebase Authentication
 
-Integração com o projeto `barber-simba`, usando o SDK modular. Login e cadastro seguem a referência enviada. A rota inicial abre /login; as demais rotas demonstrativas continuam públicas nesta etapa.
+Integração com o projeto `barber-simba`, usando o SDK modular. A rota inicial direciona a conta autenticada para a área de cliente, administrador ou barbeiro segundo as custom claims do token; sem sessão, abre `/login`. A API verifica as permissões novamente nas rotas protegidas.
 
 ## Console
 
@@ -10,7 +10,7 @@ Não é necessário habilitar Firestore, Storage ou Analytics para autenticar.
 
 ## Fluxo das telas
 
-- /login: e-mail e senha; sucesso leva à Home.
+- /login: e-mail e senha; sucesso leva à área correspondente à conta.
 - /cadastro: nome, e-mail, senha e confirmação. Senhas diferentes não são enviadas ao Firebase.
 - Após criar a conta, salva o nome no perfil Firebase e encerra a sessão. Só então mostra o popup "Cadastro confirmado com sucesso".
 - OK (ou Escape) fecha o popup e retorna ao login, sem senha preenchida e sem login automático.
@@ -24,7 +24,7 @@ import { useAuth } from '../hooks/useAuth'
 import { authErrorMessage } from '../services/authErrors'
 
 // Dentro de um componente:
-const { usuario, carregando, erroSessao, cadastrar, entrar, sair } = useAuth()
+const { usuario, papel, carregando, erroSessao, cadastrar, entrar, sair } = useAuth()
 
 // Dentro dos handlers dos formulários, com estado local de envio/erro:
 try {
@@ -49,9 +49,9 @@ try {
 
 ## Limites atuais
 
-A interface continua demonstrativa. A saudação e o perfil ainda não consomem o usuário Firebase; isso será feito com as telas. Os agendamentos em sessionStorage não estão associados a um UID nem protegidos por autenticação. Não utilize dados pessoais reais nesse fluxo demonstrativo.
+Com `VITE_USE_NEON=true`, agendamentos são associados ao UID Firebase e consultados pela API; nome e e-mail do Firebase aparecem nas telas correspondentes. Parte dos campos adicionais do perfil ainda usa armazenamento local. Sem essa opção, o fluxo demonstrativo grava dados na sessão do navegador e não produz uma reserva real.
 
-Há recuperação de senha e gravação do nome no perfil Auth. Não há verificação de e-mail, regras de banco ou notificações de agendamento.
+Há recuperação de senha e gravação do nome no perfil Auth. O código atual não envia e-mail de verificação de cadastro. Notificações e avaliações ainda não são persistidas pela API. O acesso de barbeiro é concedido pelo administrador a uma conta já existente; a claim `admin: true` continua a ser concedida apenas pelo script local protegido.
 
 ## Verificar
 
@@ -62,7 +62,7 @@ npm.cmd run build
 npm.cmd run lint
 ```
 
-Os seis testes usam funções simuladas do SDK e incluem a sequência criar conta → salvar nome → logout. Não criam contas nem acessam o projeto real. O teste real deve ser feito pelo usuário usando os formulários e o provedor E-mail/senha habilitado.
+Os testes locais usam funções simuladas do SDK e incluem a sequência criar conta → salvar nome → logout. Não criam contas nem acessam o projeto real. O fluxo com contas de administrador e barbeiro também foi validado manualmente pelo usuário.
 
 Documentação: https://firebase.google.com/docs/auth/web/start
 # Recuperação com telas do Simba

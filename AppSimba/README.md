@@ -1,25 +1,23 @@
-# Barber Simba — aplicação
+# Barber Simba — frontend
 
-Aplicação React JS + Vite, com React Router e CSS puro.
+Aplicação React + Vite. O mesmo login Firebase direciona clientes, administradores e barbeiros para suas respectivas áreas. Com `VITE_USE_NEON=true`, catálogo, horários e agendamentos consultam a API em `/api`; o Vite a encaminha para `localhost:3001` no desenvolvimento.
 
-Consulte o [README principal](../README.md) para funcionalidades, rotas, instalação, testes e pendências.
+## Executar
 
-## Executar nesta pasta
+Inicie primeiro a API conforme o [guia principal](../README.md). Nesta pasta, copie `.env.example` para `.env.local` e execute:
 
-```bash
-npm install
-npm run dev
+```powershell
+npm.cmd install
+npm.cmd run dev
 ```
 
-No PowerShell, utilize `npm.cmd install` e `npm.cmd run dev` se `npm.ps1` estiver bloqueado.
+Para conferir a compilação e o lint:
 
-## Verificar
-
-```bash
-npm run build
-npm run lint
+```powershell
+npm.cmd run build
+npm.cmd run lint
 ```
 
-O agendamento é demonstrativo e armazenado na sessão do navegador. Não há reserva real nem envio de notificações.
+Sem `VITE_USE_NEON=true`, parte do fluxo funciona no modo de demonstração com dados na sessão do navegador. Notificações do cliente e avaliações ainda não são persistidas na API; a área do barbeiro mostra avisos informativos nessas telas. Veja o [estado e as próximas implementações](../docs/STATUS_E_PROXIMOS_PASSOS.md) e os [detalhes da API](../api/README.md).
 
-Veja também a [auditoria](AUDITORIA.md).
+A [auditoria visual anterior](AUDITORIA.md) registra uma fase inicial da interface e não descreve as integrações atuais.
