@@ -2,6 +2,7 @@ import express from 'express'
 import { getPool } from './db.js'
 import { requireAdmin, requireUser, verifyFirebaseToken } from './auth.js'
 import { createAdminRouter } from './admin.js'
+import { createProfessionalRouter } from './professional.js'
 import { availableTimes, futureLocal, scheduleDays, validDate, validTime } from './availability.js'
 
 const bookingFields = `b.id, b.status, b.observacoes,
@@ -9,7 +10,7 @@ const bookingFields = `b.id, b.status, b.observacoes,
   to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'HH24:MI') AS horario,
   s.nome AS servico, p.nome AS profissional`
 
-export function createApp(query = (sql, params) => getPool().query(sql, params), verifyToken = verifyFirebaseToken) {
+export function createApp(query = (sql, params) => getPool().query(sql, params), verifyToken = verifyFirebaseToken, accountDirectory) {
   const app = express()
   app.disable('x-powered-by')
   app.use(express.json({ limit: '16kb' }))
@@ -130,7 +131,8 @@ export function createApp(query = (sql, params) => getPool().query(sql, params),
     } catch (error) { next(error) }
   })
 
-  app.use('/api/admin', authenticated, requireAdmin, createAdminRouter(query))
+  app.use('/api/admin', authenticated, requireAdmin, createAdminRouter(query, accountDirectory))
+  app.use('/api/professional', authenticated, createProfessionalRouter(query))
 
   app.use((error, _request, response, _next) => {
     console.error('Falha na API:', error)

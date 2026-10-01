@@ -8,12 +8,14 @@ Projeto `simba-barber` (`spring-smoke-73415339`), banco `neondb`:
 
 | Branch | Uso | Situação em 30/09/2026 |
 | --- | --- | --- |
-| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; migrações `001` a `004` aplicadas. As URLs desta branch estão no `api/.env` local de desenvolvimento. |
-| `production` | Futuro ambiente publicado | Branch padrão; migrações `001` a `004` aplicadas e verificadas no SQL Editor em 30/09/2026. A API ainda não foi publicada. |
+| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; migrações `001` a `005` aplicadas e acesso do barbeiro testado. As URLs desta branch estão no `api/.env` local de desenvolvimento. |
+| `production` | Futuro ambiente publicado | Branch padrão; migrações `001` a `005` aplicadas e verificadas no SQL Editor em 30/09/2026. A API ainda não foi publicada. |
 
 Cada branch tem suas próprias URLs de conexão. Não use a URL de `production` no `.env` local ao testar agendamentos e novas telas. O arquivo `.env` contém credenciais e não deve ser enviado ao GitHub.
 
 A disponibilidade exige a migração `003_availability.sql`; a agenda administrativa e o status `em_atendimento` exigem `004_in_progress.sql`. O script `npm.cmd run db:migrate` usa a conexão direta `DATABASE_URL_UNPOOLED`, registra as migrações e não as repete. Confira a branch de destino antes de executar novas migrações.
+
+O acesso do barbeiro exige `005_professional_accounts.sql`, já aplicada nas branches `dev-simba-integracao` e `production`. Em novos ambientes, execute `npm.cmd run db:migrate` a partir de `api` com `DATABASE_URL_UNPOOLED` apontando para a branch correta.
 
 ## Configuração local
 
@@ -80,3 +82,9 @@ npm.cmd run admin:claim -- grant UID_DA_CONTA
 ```
 
 Para retirar a permissão: `npm.cmd run admin:claim -- revoke UID_DA_CONTA`. O script conserva outras custom claims da conta. Não envie a chave ao repositório ou ao navegador. Após uma mudança, a conta deve atualizar o ID token (por exemplo, sair e entrar de novo); tokens já emitidos podem continuar válidos até expirarem. Nenhuma conta recebe acesso administrativo automaticamente ao aplicar este código.
+
+## Acesso e agenda do profissional
+
+O cadastro em **Admin → Equipe** cria o perfil do profissional no catálogo. Para conceder acesso ao app, a pessoa cria uma conta normal em **Cadastro** com seu próprio e-mail e senha. O administrador abre **Equipe → Editar profissional → Acesso ao app** e vincula o e-mail dessa conta ao profissional. A API precisa das credenciais Firebase Admin (`GOOGLE_APPLICATION_CREDENTIALS`) para localizar a conta e atribuir a custom claim `professional: true`; a senha não passa pelo administrador. A pessoa deve sair e entrar novamente para atualizar o token. Um profissional inativo ou sem vínculo no banco recebe 403, mesmo que tenha um token antigo com a claim. O administrador também pode remover o acesso nessa tela antes de excluir o cadastro da equipe.
+
+As rotas `/api/professional/*` exigem token Firebase de uma conta vinculada e ativa. `GET /me`, `/dashboard`, `/bookings?start=AAAA-MM-DD&end=AAAA-MM-DD`, `/hours` e `/services` retornam dados para o painel, agenda e perfil. A consulta de agendamentos fica restrita ao `professional_id` da conta e aceita períodos locais de até 32 dias. `PATCH /bookings/:id/status` permite apenas `confirmado → em_atendimento → concluido` em reservas do próprio profissional; não existem rotas de cancelamento ou exclusão para esse papel. O catálogo de serviços é comum a toda a equipe. Notificações e avaliações do barbeiro ainda não possuem dados persistidos; suas telas informam essa limitação.
