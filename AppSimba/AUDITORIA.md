@@ -1,5 +1,7 @@
 # Auditoria Barber Simba
 
+> Registro histórico da fase inicial da interface. As pendências abaixo refletem aquela etapa; para o estado atual da API, dos agendamentos e dos próximos passos, consulte o [README principal](../README.md) e a [documentação de status](../docs/STATUS_E_PROXIMOS_PASSOS.md).
+
 Referência: captura das sete telas fornecida pelo usuário; prioridade para a instrução de manter profissionais no tema escuro.
 
 ## Corrigido

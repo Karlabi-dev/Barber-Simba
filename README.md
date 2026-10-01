@@ -1,126 +1,87 @@
 # Barber Simba
 
-Interface web de uma barbearia, com catálogo de serviços, profissionais e fluxo de agendamento demonstrativo. Projeto em desenvolvimento, baseado no protótipo do Figma.
+Aplicação web de agendamentos para clientes, administradores e barbeiros. O mesmo login Firebase abre a área correspondente à permissão da conta. O catálogo, a disponibilidade e os agendamentos são atendidos por uma API Node.js com Postgres no Neon quando `VITE_USE_NEON=true`.
 
-> Etapa atual: interface e navegação implementadas, com fluxo de agendamento testado manualmente. Não realiza reservas reais nem envia notificações.
+**Estado atual:** o fluxo real de agendamento, a gestão administrativa e o atendimento do barbeiro foram testados localmente. A API e o frontend ainda não foram publicados. Notificações e avaliações ainda não são persistidas no banco.
 
 ## Tecnologias
 
-| Tecnologia | Aplicação |
+| Parte | Tecnologias |
 | --- | --- |
-| React JS | Interface e componentes reutilizáveis |
-| Vite | Desenvolvimento e build |
-| React Router | Navegação entre telas |
-| CSS | Identidade visual e responsividade |
-| Git + GitHub | Versionamento e colaboração |
+| Interface (`AppSimba/`) | React, Vite, React Router e CSS |
+| API (`api/`) | Node.js, Express e `pg` |
+| Dados | Postgres no Neon, com migrações SQL versionadas |
+| Login e permissões | Firebase Authentication e custom claims verificadas pela API |
 
-## Funcionalidades
+## Funcionalidades implementadas
 
-- Tela de carregamento e Home com destaques.
-- Busca de profissionais, incluindo Allander com a foto fornecida.
-- Catálogo com busca e filtros Todos, Cabelo, Barba e Combos.
-- Seleção de serviço, profissional, data, horário e observações.
-- Revisão, edição e confirmação demonstrativa do agendamento.
-- Preservação dos dados em `sessionStorage` na sessão do navegador.
-- Tema escuro com destaques dourados e ações em vermelho.
-- Página provisória de perfil, identificada como demonstração.
+| Área | Funcionalidades |
+| --- | --- |
+| Cliente | Cadastro e login; catálogo de serviços e profissionais; consulta de horários livres; agendamento com escolha de serviço, profissional, data e horário; histórico e cancelamento de reserva confirmada própria. |
+| Administrador | Painel e agenda de agendamentos; criação, edição, desativação e exclusão condicionada de serviços e profissionais; horários da equipe; vínculo de uma conta Firebase existente a um barbeiro; início, finalização e cancelamento nos estados permitidos. |
+| Barbeiro | Painel, agenda e perfil próprios; consulta dos serviços e horários; início e finalização de atendimentos atribuídos à própria conta. Não pode cancelar ou excluir agendamentos. |
 
-A Home ainda apresenta um agendamento ilustrativo. Não há consulta de disponibilidade real, backend ou banco de dados de agendamentos.
+O navegador usa as claims para direcionar a conta; a API verifica a permissão e o vínculo do profissional antes de consultar ou alterar dados. A conta de barbeiro deve ser criada com e-mail e senha próprios e depois vinculada em **Admin → Equipe → Editar profissional → Acesso ao app**. A senha não é entregue ao administrador.
 
-## Firebase Authentication
+O projeto também conserva um modo de demonstração quando `VITE_USE_NEON` não está ativo. Nesse modo, alguns dados ficam na sessão do navegador e **não** representam reservas compartilhadas entre contas. As notificações do cliente e as avaliações de demonstração também usam armazenamento local; as telas correspondentes do barbeiro informam que ainda não há dados persistidos.
 
-A autenticação está integrada ao React com telas de login e cadastro, recuperação de senha e observação da sessão. O cadastro salva o nome, encerra a sessão e exibe um popup de sucesso; ao fechar o popup, retorna ao login. As demais rotas demonstrativas continuam públicas. Configuração: projeto Firebase `barber-simba`.
+## Executar localmente no Windows
 
-Consulte o [guia de integração](AppSimba/FIREBASE_AUTH.md) para habilitar o provedor, conectar as futuras telas e entender a persistência de sessão. Os testes atuais simulam o SDK e não confirmam acesso ao Firebase real.
+Requisitos: Git, Node.js compatível com as dependências e npm. Os comandos abaixo partem da pasta principal `Barber-Simba`, depois de clonar o repositório. Use **a branch de desenvolvimento do Neon** nas URLs do `api/.env`; a branch `production` já existe para uma futura publicação.
 
-## Executar localmente
+1. Na pasta `api`, crie `.env` a partir de `.env.example`. Preencha `DATABASE_URL` com a URL agrupada (pooler) e `DATABASE_URL_UNPOOLED` com a URL direta **da mesma branch de desenvolvimento**. Não publique esse arquivo.
+2. Inicie a API em um terminal PowerShell:
 
-Requisitos: Git, Node.js compatível com as dependências do projeto e npm.
+   ```powershell
+   cd .\api
+   npm.cmd install
+   npm.cmd run db:migrate
+   npm.cmd run dev
+   ```
 
-```bash
-git clone https://github.com/Karlabi-dev/Barber-Simba.git
-cd Barber-Simba/AppSimba
-npm install
-npm run dev
-```
+3. Em outro PowerShell, na pasta `AppSimba`, crie `.env.local` a partir de `.env.example` e mantenha `VITE_USE_NEON=true`. Depois inicie o frontend:
 
-Abra o endereço informado pelo Vite no terminal.
+   ```powershell
+   cd .\AppSimba
+   npm.cmd install
+   npm.cmd run dev
+   ```
 
-No PowerShell, se a execução de `npm.ps1` estiver bloqueada, use:
+4. Abra o endereço informado pelo Vite. A API responde em `http://localhost:3001/api/health`; o Vite encaminha as chamadas `/api` para ela.
+
+Para **conceder ou retirar acesso de barbeiro**, a API também precisa de uma chave de conta de serviço do mesmo projeto Firebase. Guarde o JSON fora do repositório e defina `GOOGLE_APPLICATION_CREDENTIALS` **no terminal em que iniciar a API**, por exemplo:
 
 ```powershell
-npm.cmd install
-npm.cmd run dev
+$env:GOOGLE_APPLICATION_CREDENTIALS = "$env:USERPROFILE\.secrets\barber-simba\firebase-admin.json"
+Test-Path $env:GOOGLE_APPLICATION_CREDENTIALS
 ```
 
-Não é necessário alterar a política de execução do Windows.
+O teste de caminho precisa retornar `True`. O arquivo JSON não deve entrar no Git, no frontend ou em uma mensagem. A configuração web do Firebase no código cliente é diferente dessa chave administrativa.
 
-## Comandos
+Se o Vite mostrar `ECONNREFUSED` para `/api`, confira se a API está rodando no outro terminal. No PowerShell, `npm.cmd` evita o bloqueio de `npm.ps1` sem mudar a política de execução.
 
-Execute dentro da pasta `AppSimba`.
+## Rotas principais
 
-| Comando | Finalidade |
+| Área | Caminhos |
 | --- | --- |
-| `npm run dev` | Iniciar servidor de desenvolvimento |
-| `npm run build` | Gerar build em `dist` |
-| `npm run preview` | Visualizar o build localmente |
-| `npm run lint` | Verificar código com Oxlint |
+| Autenticação e cliente | `/login`, `/cadastro`, `/home`, `/servicos`, `/profissionais`, `/agendamento`, `/agendas`, `/perfil` |
+| Administração | `/admin`, `/admin/agenda`, `/admin/servicos`, `/admin/equipe` |
+| Barbeiro | `/profissional`, `/profissional/agenda`, `/profissional/perfil`, `/profissional/notificacoes` |
 
-## Organização
+As rotas protegidas exigem login e a permissão correspondente. Em futura hospedagem, a aplicação precisa de fallback para `index.html` nas rotas do React Router e de encaminhamento de `/api` ao servidor da API.
 
-- `AppSimba/src/pages/`: telas.
-- `AppSimba/src/components/`: componentes compartilhados.
-- `AppSimba/src/data/`: dados demonstrativos e armazenamento do agendamento.
-- `AppSimba/src/assets/`: imagens e ícones.
-- `AppSimba/src/App.jsx`: rotas.
-- `AppSimba/src/App.css` e `index.css`: estilos.
-- [Auditoria e pendências](AppSimba/AUDITORIA.md).
-
-## Rotas
-
-| Caminho | Tela |
-| --- | --- |
-| `/` | Redirecionamento para login |
-| `/login` | Login e recuperação de senha |
-| `/cadastro` | Cadastro e popup de confirmação |
-| `/loading` | Carregamento |
-| `/home` | Home |
-| `/profissionais` | Lista de profissionais |
-| `/servicos` | Catálogo |
-| `/agendamento` | Formulário |
-| `/confirmar-agendamento` | Revisão |
-| `/agendamento-confirmado` | Confirmação demonstrativa |
-| `/perfil` | Perfil provisório |
-
-Em uma futura hospedagem, configure o fallback das rotas para `index.html`, pois a aplicação utiliza BrowserRouter.
-
-## Validação desta etapa
-
-- Build do Vite e lint executados sem erros.
-- Armazenamento de agendamento verificado com dados vazios, válidos e inválidos.
-- Fluxo de agendamento testado manualmente pelo usuário.
-- Fidelidade visual completa e testes automatizados de navegador ainda pendentes.
-
-## Pendências
-
-- Fotos dos demais profissionais, banner e ícones originais.
-- Finalização visual conforme os recursos exportados do Figma.
-- Definição da tela de perfil.
-- Teste real de cadastro/login e recuperação de senha pelo usuário.
-- Integrações de disponibilidade, reservas e notificações, caso sejam incluídas no escopo futuro.
-
-As imagens provisórias não representam uma implementação visual definitiva. Nenhum WhatsApp ou e-mail é enviado pela aplicação.
-
-## Referência visual
-
-[Protótipo BarberSimba no Figma](https://www.figma.com/design/juXMdCvi7DpDtMVkWL6yEL/BarberSimba?node-id=0-1)
-
-## Problema de atualização no Windows
-
-Versões antigas continham `button.jsx` e `Button.jsx`. A versão atual mantém apenas `Button.jsx`. Se, após atualizar uma cópia antiga, o Vite não encontrar esse componente, primeiro confira suas alterações com `git status`. Se não houver alterações próprias a preservar nesse arquivo, recupere a cópia versionada, dentro de `AppSimba`:
+## Testes e documentação
 
 ```powershell
-git restore --source=HEAD --worktree -- src/components/Button.jsx
+cd api
+npm.cmd test
+cd ..\AppSimba
+npm.cmd run build
+npm.cmd run lint
 ```
 
-Reinicie o servidor. Não aplique backups antigos automaticamente sem revisar possíveis conflitos.
+- [Estado atual e próximas implementações](docs/STATUS_E_PROXIMOS_PASSOS.md): notificações reais, avaliações reais e publicação, ainda pendentes.
+- [API, migrações e permissões](api/README.md): detalhes do Neon, agendamentos e rotas administrativas e do barbeiro.
+- [Autenticação Firebase](AppSimba/FIREBASE_AUTH.md).
+- [Auditoria visual anterior](AppSimba/AUDITORIA.md): registro histórico da fase inicial da interface; não descreve o estado atual das integrações.
+- [Protótipo no Figma](https://www.figma.com/design/juXMdCvi7DpDtMVkWL6yEL/BarberSimba?node-id=0-1).
