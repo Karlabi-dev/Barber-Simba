@@ -2,6 +2,8 @@
 
 Atualizado em 01/10/2026. Este documento registra o ponto em que o Simba foi deixado para retomarmos o trabalho; as três tarefas abaixo **ainda não foram implementadas**. Ao concluir cada etapa, atualizaremos este documento e os READMEs conforme o comportamento entregue.
 
+Para a visão completa do sistema e os passos de configuração, consulte o [Guia do projeto](GUIA_DO_PROJETO.md).
+
 ## Estado confirmado
 
 - Um único app abre as áreas de cliente, administrador e barbeiro de acordo com as permissões da conta Firebase. A API valida os tokens e restringe as operações por usuário e profissional.

@@ -80,6 +80,7 @@ npm.cmd run build
 npm.cmd run lint
 ```
 
+- [Guia completo do projeto](docs/GUIA_DO_PROJETO.md): arquitetura, perfis, fluxos, configuração e limites atuais.
 - [Estado atual e próximas implementações](docs/STATUS_E_PROXIMOS_PASSOS.md): notificações reais, avaliações reais e publicação, ainda pendentes.
 - [API, migrações e permissões](api/README.md): detalhes do Neon, agendamentos e rotas administrativas e do barbeiro.
 - [Autenticação Firebase](AppSimba/FIREBASE_AUTH.md).
