@@ -8,14 +8,14 @@ Projeto `simba-barber` (`spring-smoke-73415339`), banco `neondb`:
 
 | Branch | Uso | Situação em 30/09/2026 |
 | --- | --- | --- |
-| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; migrações `001` a `004` aplicadas. A migração `005_professional_accounts.sql` precisa ser aplicada antes de testar o acesso do barbeiro. As URLs desta branch estão no `api/.env` local de desenvolvimento. |
-| `production` | Futuro ambiente publicado | Branch padrão; migrações `001` a `004` aplicadas e verificadas no SQL Editor em 30/09/2026. A migração `005` ainda não foi aplicada; a API ainda não foi publicada. |
+| `dev-simba-integracao` | Desenvolvimento local e testes | Sem expiração automática; migrações `001` a `005` aplicadas e acesso do barbeiro testado. As URLs desta branch estão no `api/.env` local de desenvolvimento. |
+| `production` | Futuro ambiente publicado | Branch padrão; migrações `001` a `005` aplicadas e verificadas no SQL Editor em 30/09/2026. A API ainda não foi publicada. |
 
 Cada branch tem suas próprias URLs de conexão. Não use a URL de `production` no `.env` local ao testar agendamentos e novas telas. O arquivo `.env` contém credenciais e não deve ser enviado ao GitHub.
 
 A disponibilidade exige a migração `003_availability.sql`; a agenda administrativa e o status `em_atendimento` exigem `004_in_progress.sql`. O script `npm.cmd run db:migrate` usa a conexão direta `DATABASE_URL_UNPOOLED`, registra as migrações e não as repete. Confira a branch de destino antes de executar novas migrações.
 
-O acesso do barbeiro exige `005_professional_accounts.sql`. Aplique-a primeiro na branch de desenvolvimento com `npm.cmd run db:migrate` a partir de `api`, após confirmar que a URL direta no `.env` aponta para `dev-simba-integracao`. A migração ainda não foi aplicada em nenhuma branch pelo código desta funcionalidade.
+O acesso do barbeiro exige `005_professional_accounts.sql`, já aplicada nas branches `dev-simba-integracao` e `production`. Em novos ambientes, execute `npm.cmd run db:migrate` a partir de `api` com `DATABASE_URL_UNPOOLED` apontando para a branch correta.
 
 ## Configuração local
 
