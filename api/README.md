@@ -1,6 +1,6 @@
 # API e banco do Simba
 
-Catálogo público e agendamentos no Postgres do Neon. A tela de avaliações e as notificações ainda são demonstrações locais.
+Catálogo público, agendamentos e avisos do cliente no Postgres do Neon. As avaliações ainda são uma demonstração local.
 
 ## Ambientes Neon
 
@@ -15,7 +15,7 @@ Cada branch tem suas próprias URLs de conexão. Não use a URL de `production` 
 
 A disponibilidade exige a migração `003_availability.sql`; a agenda administrativa e o status `em_atendimento` exigem `004_in_progress.sql`. O script `npm.cmd run db:migrate` usa a conexão direta `DATABASE_URL_UNPOOLED`, registra as migrações e não as repete. Confira a branch de destino antes de executar novas migrações.
 
-O acesso do barbeiro exige `005_professional_accounts.sql`, já aplicada nas branches `dev-simba-integracao` e `production`. Em novos ambientes, execute `npm.cmd run db:migrate` a partir de `api` com `DATABASE_URL_UNPOOLED` apontando para a branch correta.
+O acesso do barbeiro exige `005_professional_accounts.sql`, já aplicada nas branches `dev-simba-integracao` e `production`. As notificações exigem `006_customer_notifications.sql`, que precisa ser aplicada na branch de testes **antes** de publicar esta versão da API. Em novos ambientes, execute `npm.cmd run db:migrate` a partir de `api` com `DATABASE_URL_UNPOOLED` apontando para a branch correta.
 
 ## Configuração local
 
@@ -37,7 +37,15 @@ Sem `VITE_USE_NEON=true`, o app mantém o modo de demonstração. Com a opção 
 - `PATCH /api/bookings/:id/cancel`: cancela somente um agendamento confirmado do próprio usuário; não cancela um atendimento já iniciado.
 - `GET /api/availability?serviceSlug=corte-premium&professionalSlug=allander&data=2026-10-05`: retorna `{ "data": "2026-10-05", "horarios": ["08:00", "08:30", ...] }` para a data escolhida; não exige login.
 
-As três rotas de `/api/bookings` exigem `Authorization: Bearer <Firebase ID token>`; a disponibilidade é pública. A API verifica assinatura, validade e projeto do token com Firebase Admin (`FIREBASE_PROJECT_ID=barber-simba`); nunca recebe uma senha do Firebase. O horário é interpretado em `America/Fortaleza`. Avaliações e notificações continuam locais e não representam mensagens efetivamente enviadas.
+As três rotas de `/api/bookings` exigem `Authorization: Bearer <Firebase ID token>`; a disponibilidade é pública. A API verifica assinatura, validade e projeto do token com Firebase Admin (`FIREBASE_PROJECT_ID=barber-simba`); nunca recebe uma senha do Firebase. O horário é interpretado em `America/Fortaleza`. As notificações são internas ao app; não enviam mensagens por e-mail, WhatsApp ou push.
+
+## Notificações do cliente
+
+- `GET /api/notifications`: lista até 100 avisos do próprio usuário. A criação da reserva e o cancelamento, tanto pelo cliente quanto pelo administrador, geram eventos persistidos automaticamente no banco.
+- A consulta cria um lembrete no dia anterior (horário de Fortaleza) e outro na hora anterior ao início de uma reserva **confirmada**, uma vez cada. O aplicativo consulta na abertura, ao voltar para a aba e a cada minuto enquanto estiver aberto. Se estiver fechado durante essas janelas, não haverá alerta externo nem lembrete retroativo.
+- `PATCH /api/notifications/read`: marca como lidos os avisos da própria conta. O estado de leitura acompanha a conta em outros dispositivos.
+
+As duas rotas exigem token Firebase. A migração `006_customer_notifications.sql` cria a tabela, a restrição contra duplicatas e o gatilho que registra criação e cancelamento. Somente eventos posteriores à migração geram avisos; reservas existentes continuam no histórico. Um lembrete de reserva cancelada ou concluída deixa de aparecer. Avisos para profissionais e eventos de início/conclusão ainda são uma etapa posterior.
 
 ### Disponibilidade e duração
 

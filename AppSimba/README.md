@@ -18,6 +18,6 @@ npm.cmd run build
 npm.cmd run lint
 ```
 
-Sem `VITE_USE_NEON=true`, parte do fluxo funciona no modo de demonstração com dados na sessão do navegador. Notificações do cliente e avaliações ainda não são persistidas na API; a área do barbeiro mostra avisos informativos nessas telas. Veja o [estado e as próximas implementações](../docs/STATUS_E_PROXIMOS_PASSOS.md) e os [detalhes da API](../api/README.md).
+Sem `VITE_USE_NEON=true`, parte do fluxo funciona no modo de demonstração com dados na sessão do navegador. Com Neon ativo e a migração `006`, as notificações do cliente vêm da API e mantêm o estado de leitura entre dispositivos. Lembretes aparecem no app na véspera e na hora anterior ao atendimento quando ele é aberto; não são mensagens push. Avaliações e notificações do barbeiro continuam informativas. Veja o [estado e as próximas implementações](../docs/STATUS_E_PROXIMOS_PASSOS.md) e os [detalhes da API](../api/README.md).
 
 A [auditoria visual anterior](AUDITORIA.md) registra uma fase inicial da interface e não descreve as integrações atuais.

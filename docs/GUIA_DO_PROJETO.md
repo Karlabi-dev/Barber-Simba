@@ -1,6 +1,6 @@
 # Barber Simba | Guia do projeto
 
-**Versão:** 1.0 · **Atualização:** 01/10/2026 · **Situação:** desenvolvimento local validado, publicação pendente
+**Versão:** 1.1 · **Atualização:** 05/10/2026 · **Situação:** homologação publicada; avisos do cliente aguardam migração e novo deploy
 
 Este guia reúne o funcionamento atual, as decisões de acesso, a configuração do ambiente e as próximas entregas. Ele descreve o código da `main` após a integração da área do barbeiro. O [README principal](../README.md) serve como entrada rápida; o [guia da API](../api/README.md) contém os detalhes das rotas e das migrações.
 
@@ -27,7 +27,7 @@ No desenvolvimento, o frontend chama `/api`; o Vite encaminha essas requisiçõe
 
 ### Limites atuais
 
-O app e a API ainda não foram publicados. As notificações do cliente e as avaliações de demonstração ficam no navegador; as telas equivalentes do barbeiro informam que ainda não há integração persistida. Alguns campos adicionais do perfil do cliente também usam armazenamento local. Sem `VITE_USE_NEON=true`, parte do fluxo usa dados de demonstração e não cria reservas compartilhadas.
+A homologação está publicada no Render com a branch de testes do Neon. Os avisos do cliente foram implementados para criação, cancelamento, véspera e hora anterior à reserva; a migração `006` e o novo deploy ainda são necessários para ativá-los na URL pública. Avaliações de demonstração e notificações do barbeiro ainda não são persistidas. Alguns campos adicionais do perfil do cliente também usam armazenamento local. Sem `VITE_USE_NEON=true`, parte do fluxo usa dados de demonstração e não cria reservas compartilhadas.
 
 ## 2. Perfis e permissões
 
@@ -131,11 +131,11 @@ Na entrega da área do barbeiro, os 16 testes da API passaram e o build Vite foi
 
 ## 7. Próximas implementações
 
-As três etapas a seguir estão **pendentes**. O [registro de tarefas](STATUS_E_PROXIMOS_PASSOS.md) será atualizado junto com este guia e os READMEs após cada entrega.
+Consulte o [registro de tarefas](STATUS_E_PROXIMOS_PASSOS.md) para o estado mais recente de cada entrega.
 
 ### 7.1 Notificações reais
 
-Persistir avisos dentro do app para criação, cancelamento e mudança de estado do agendamento. Cliente e barbeiro devem enxergar apenas os avisos relacionados às suas contas; avisos lidos precisam continuar lidos depois de uma nova sessão. A entrega será aceita quando eventos não gerarem duplicatas e uma conta não puder ler ou alterar avisos de outra. E-mail, WhatsApp e push não fazem parte desta primeira versão.
+Os avisos do cliente para criação, cancelamento, véspera e hora anterior à reserva estão implementados no código, com leitura persistida e acesso restrito ao UID. É necessário aplicar a migração `006` na branch de testes e fazer o deploy manual. Avisos do barbeiro e eventos de início/conclusão continuam pendentes. E-mail, WhatsApp e push não fazem parte desta versão.
 
 ### 7.2 Avaliações reais
 
@@ -143,7 +143,7 @@ Permitir uma avaliação de 1 a 5 estrelas por agendamento concluído, enviada a
 
 ### 7.3 Publicação do app e da API
 
-Escolher hospedagem para frontend e API, configurar as variáveis da branch `production` e guardar credenciais administrativas apenas no servidor. Configurar o encaminhamento de `/api`, fallback das rotas React e autenticação no domínio final. A entrega será aceita quando os três papéis completarem seus fluxos pela URL pública, `/api/health` responder e nenhum segredo estiver no frontend ou no repositório.
+A homologação em `simba-homologacao.onrender.com` usa a branch de testes do Neon. Os três papéis, as rotas React, a API e `/api/health` foram validados no domínio. A publicação futura com dados da branch `production` será planejada separadamente.
 
 ## 8. Como retomar o trabalho
 
