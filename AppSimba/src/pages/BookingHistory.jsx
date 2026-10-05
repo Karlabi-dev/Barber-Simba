@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import { readBookingHistory, updateBookingStatus } from '../data/booking'
+import { NOTIFICATIONS_CHANGED } from '../data/notifications'
 import { listBookings, cancelBooking } from '../services/bookings'
 import { useAuth } from '../hooks/useAuth'
 import { barbeiros } from '../data/barbeiros'
@@ -30,6 +31,7 @@ export default function BookingHistory() {
       if (useNeon) {
         await cancelBooking(usuario, id)
         setBookings(current => current.map(item => item.id === id ? { ...item, status: 'cancelado' } : item))
+        window.dispatchEvent(new Event(NOTIFICATIONS_CHANGED))
       } else setBookings(updateBookingStatus(id, 'cancelado'))
       setError('')
     } catch (cause) { setError(cause.message || 'Não foi possível salvar o cancelamento.') }

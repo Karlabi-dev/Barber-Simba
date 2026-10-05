@@ -8,7 +8,7 @@ export default function BookingSuccess() {
   const navigate = useNavigate()
   return <AppShell nav={false} className="success-screen"><section className="success-final">
     <span className="check-circle">✓</span><h1>Tudo pronto!</h1><p>{useNeon ? 'Seu agendamento foi confirmado.' : 'Agendamento de demonstração salvo neste navegador.'}</p>
-    <div className="reminder"><img src={bell} alt="" /><p>Demonstração: nenhum WhatsApp ou e-mail foi enviado.</p></div>
+    <div className="reminder"><img src={bell} alt="" /><p>{useNeon ? 'A confirmação está nas notificações do app. Perto do horário, você verá um lembrete ao abrir o Simba.' : 'Demonstração: nenhum WhatsApp ou e-mail foi enviado.'}</p></div>
     <Button onClick={() => navigate('/home')}>Voltar para a Home</Button>
   </section></AppShell>
 }

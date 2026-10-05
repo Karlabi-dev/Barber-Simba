@@ -2,7 +2,7 @@
 
 Aplicação web de agendamentos para clientes, administradores e barbeiros. O mesmo login Firebase abre a área correspondente à permissão da conta. O catálogo, a disponibilidade e os agendamentos são atendidos por uma API Node.js com Postgres no Neon quando `VITE_USE_NEON=true`.
 
-**Estado atual:** o fluxo real de agendamento, a gestão administrativa e o atendimento do barbeiro foram testados localmente. A API e o frontend ainda não foram publicados. Notificações e avaliações ainda não são persistidas no banco.
+**Estado atual:** agendamentos e os três perfis foram validados na homologação [simba-homologacao.onrender.com](https://simba-homologacao.onrender.com), usando a branch de testes do Neon. Os avisos persistidos do cliente dependem da migração `006` e de um novo deploy manual. Avaliações ainda não são persistidas no banco.
 
 ## Tecnologias
 
@@ -17,13 +17,13 @@ Aplicação web de agendamentos para clientes, administradores e barbeiros. O me
 
 | Área | Funcionalidades |
 | --- | --- |
-| Cliente | Cadastro e login; catálogo de serviços e profissionais; consulta de horários livres; agendamento com escolha de serviço, profissional, data e horário; histórico e cancelamento de reserva confirmada própria. |
+| Cliente | Cadastro e login; catálogo de serviços e profissionais; consulta de horários livres; agendamento com escolha de serviço, profissional, data e horário; histórico e cancelamento de reserva confirmada própria; avisos internos de criação, cancelamento, véspera e início próximo após a migração `006`. |
 | Administrador | Painel e agenda de agendamentos; criação, edição, desativação e exclusão condicionada de serviços e profissionais; horários da equipe; vínculo de uma conta Firebase existente a um barbeiro; início, finalização e cancelamento nos estados permitidos. |
 | Barbeiro | Painel, agenda e perfil próprios; consulta dos serviços e horários; início e finalização de atendimentos atribuídos à própria conta. Não pode cancelar ou excluir agendamentos. |
 
 O navegador usa as claims para direcionar a conta; a API verifica a permissão e o vínculo do profissional antes de consultar ou alterar dados. A conta de barbeiro deve ser criada com e-mail e senha próprios e depois vinculada em **Admin → Equipe → Editar profissional → Acesso ao app**. A senha não é entregue ao administrador.
 
-O projeto também conserva um modo de demonstração quando `VITE_USE_NEON` não está ativo. Nesse modo, alguns dados ficam na sessão do navegador e **não** representam reservas compartilhadas entre contas. As notificações do cliente e as avaliações de demonstração também usam armazenamento local; as telas correspondentes do barbeiro informam que ainda não há dados persistidos.
+O projeto também conserva um modo de demonstração quando `VITE_USE_NEON` não está ativo. Nesse modo, alguns dados ficam na sessão do navegador e **não** representam reservas compartilhadas entre contas. Com Neon ativo, as notificações do cliente ficam no banco após `006`; avaliações de demonstração e a tela de notificações do barbeiro ainda não têm dados persistidos.
 
 ## Executar localmente no Windows
 
@@ -82,7 +82,7 @@ npm.cmd run lint
 
 - [Guia completo do projeto](docs/GUIA_DO_PROJETO.md): arquitetura, perfis, fluxos, configuração e limites atuais.
 - [Publicação de testes no Render](docs/DEPLOY_RENDER.md): configuração do serviço web, Neon, Firebase e verificação em celulares.
-- [Estado atual e próximas implementações](docs/STATUS_E_PROXIMOS_PASSOS.md): notificações reais, avaliações reais e publicação, ainda pendentes.
+- [Estado atual e próximas implementações](docs/STATUS_E_PROXIMOS_PASSOS.md): situação dos avisos do cliente, avaliações, publicação e pendências.
 - [API, migrações e permissões](api/README.md): detalhes do Neon, agendamentos e rotas administrativas e do barbeiro.
 - [Autenticação Firebase](AppSimba/FIREBASE_AUTH.md).
 - [Auditoria visual anterior](AppSimba/AUDITORIA.md): registro histórico da fase inicial da interface; não descreve o estado atual das integrações.

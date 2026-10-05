@@ -5,7 +5,7 @@ Este guia prepara uma **homologação**, acessível por uma URL HTTPS em computa
 ## Antes de criar o serviço
 
 - O repositório no GitHub precisa conter `render.yaml` na branch escolhida.
-- Use a URL **agrupada (pooler)** da branch de testes `dev-simba-integracao` do Neon em `DATABASE_URL`. Confirme no painel do Neon que esta branch contém as migrações `001` a `005`. Para esta publicação não há migração nova.
+- Use a URL **agrupada (pooler)** da branch de testes `dev-simba-integracao` do Neon em `DATABASE_URL`. O serviço de homologação já foi criado e testado com as migrações `001` a `005`.
 - Separe o JSON da conta de serviço do projeto Firebase `barber-simba` para colocá-lo **somente nos arquivos secretos do Render**. Não envie o JSON nem a URL do banco ao GitHub, ao frontend ou a uma conversa.
 - Tenha contas de teste distintas para cliente, administrador e profissional vinculado.
 
@@ -19,6 +19,15 @@ Este guia prepara uma **homologação**, acessível por uma URL HTTPS em computa
 6. Copie a URL HTTPS exibida pelo Render. Em **Firebase Console → Authentication → Settings → Authorized domains**, adicione somente o domínio gerado, sem `https://` ou caminho. Isso é necessário para fluxos de autenticação que dependem de domínio autorizado.
 
 O Blueprint deixa o deploy automático **desligado**: alterações posteriores na `main` só entram na homologação quando você acionar **Manual Deploy → Deploy latest commit** no Render. Assim uma mudança de código não entra no teste em andamento sem decisão sua.
+
+### Atualizar a homologação com notificações
+
+1. Atualize o código local da `main` depois que a melhoria for incorporada. Na pasta `api`, confira que `DATABASE_URL_UNPOOLED` aponta para **`dev-simba-integracao`**, a mesma branch usada pelo Render. Não cole a URL em mensagens nem no Git.
+2. Execute `npm.cmd run db:migrate` na pasta `api` e confirme `Aplicada: 006_customer_notifications.sql`. A migração precisa vir **antes** do deploy do novo código, pois a API passa a consultar essa tabela.
+3. No Render, abra `simba-homologacao` e acione **Manual Deploy → Deploy latest commit**. Aguarde `Live`.
+4. Com uma conta cliente de testes, crie uma reserva e confira o aviso no sino. Cancele uma reserva confirmada via cliente ou admin e confira o aviso após abrir ou focar a aba. Marque como lidos, entre de novo e confirme que permanecem lidos. Os lembretes aparecem no dia anterior e na hora anterior ao início, quando o app é aberto nessas janelas.
+
+Não aplique a migração na branch `production` do Neon por causa da homologação; ela aponta para a branch de testes.
 
 ## Verificar pela URL pública
 
@@ -39,4 +48,4 @@ O Blueprint deixa o deploy automático **desligado**: alterações posteriores n
 | Vínculo de barbeiro falha | Confira o arquivo secreto `firebase-admin.json`, a variável `GOOGLE_APPLICATION_CREDENTIALS` e o projeto Firebase do JSON. |
 | Atualizar uma rota mostra 404 | Confira se `SERVE_FRONTEND=true` e se o build de `AppSimba` terminou. |
 
-O endereço público permite testar pelo navegador. Instalação como PWA, notificações reais e avaliações persistidas são etapas separadas. Depois que os testes estiverem corretos, escolha quando e como migrar a hospedagem para dados de produção.
+O endereço público permite testar pelo navegador. Instalação como PWA, alertas externos/push e avaliações persistidas são etapas separadas. Depois que os testes estiverem corretos, escolha quando e como migrar a hospedagem para dados de produção.

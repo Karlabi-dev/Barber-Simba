@@ -72,6 +72,47 @@ export function createApp(query = (sql, params) => getPool().query(sql, params),
   })
 
   const authenticated = requireUser(verifyToken)
+  app.get('/api/notifications', authenticated, async (request, response, next) => {
+    try {
+      // Os lembretes surgem ao consultar o app no dia anterior ou na hora
+      // anterior. A restrição única evita duplicatas entre abas e aparelhos.
+      await query(`INSERT INTO customer_notifications (booking_id, firebase_uid, type)
+        SELECT b.id, b.firebase_uid, reminder.type FROM bookings b
+        CROSS JOIN (VALUES ('reminder_day'), ('reminder')) AS reminder(type)
+        WHERE b.firebase_uid = $1 AND b.status = 'confirmado'
+          AND b.starts_at > now()
+          AND ((reminder.type = 'reminder_day' AND
+            (b.starts_at AT TIME ZONE 'America/Fortaleza')::date =
+            (now() AT TIME ZONE 'America/Fortaleza')::date + 1)
+            OR (reminder.type = 'reminder' AND b.starts_at <= now() + interval '1 hour'))
+        ON CONFLICT (booking_id, type) DO NOTHING`, [request.uid])
+      const { rows } = await query(`SELECT n.id, n.booking_id AS "bookingId", n.type,
+          n.created_at AS "createdAt", n.read_at IS NOT NULL AS "read",
+          s.nome AS servico, p.nome AS profissional,
+          to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'DD/MM/YYYY') AS data,
+          to_char(b.starts_at AT TIME ZONE 'America/Fortaleza', 'HH24:MI') AS horario
+        FROM customer_notifications n JOIN bookings b ON b.id = n.booking_id
+        JOIN services s ON s.id = b.service_id
+        JOIN professionals p ON p.id = b.professional_id
+        WHERE n.firebase_uid = $1 AND (n.type NOT IN ('reminder_day', 'reminder') OR b.status = 'confirmado')
+        ORDER BY n.created_at DESC, n.id DESC LIMIT 100`, [request.uid])
+      response.json(rows.map(item => ({
+        id: item.id, bookingId: item.bookingId, type: item.type,
+        createdAt: item.createdAt, read: item.read,
+        title: { created: 'Agendamento confirmado', cancelled: 'Agendamento cancelado', reminder_day: 'Seu agendamento é amanhã', reminder: 'Seu atendimento começa em breve' }[item.type],
+        message: `${item.servico} com ${item.profissional}, ${item.data} às ${item.horario}.`,
+      })))
+    } catch (error) { next(error) }
+  })
+
+  app.patch('/api/notifications/read', authenticated, async (request, response, next) => {
+    try {
+      const result = await query(`UPDATE customer_notifications SET read_at = now()
+        WHERE firebase_uid = $1 AND read_at IS NULL`, [request.uid])
+      response.json({ updated: result.rowCount ?? 0 })
+    } catch (error) { next(error) }
+  })
+
   app.get('/api/bookings', authenticated, async (request, response, next) => {
     try {
       const { rows } = await query(`SELECT ${bookingFields}
