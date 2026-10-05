@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import AppShell from '../components/AppShell'
 import Header from '../components/Header'
 import BarberCard from '../components/BarberCard'
-import { barbeiros } from '../data/barbeiros'
+import { loadProfessionals } from '../services/catalog'
 import calendarIcon from '../assets/icons/calendario.png'
 import clockIcon from '../assets/icons/relogio.png'
 import hero from '../assets/icons/perfil.png'
@@ -29,6 +29,10 @@ export default function Home() {
   const firstName = usuario?.displayName?.trim().split(/\s+/)[0]
   const [bookingState, setBookingState] = useState({ uid: null, items: [], error: '' })
   const [bookingRetry, setBookingRetry] = useState(0)
+  const [professionals, setProfessionals] = useState([])
+  const [professionalsLoading, setProfessionalsLoading] = useState(true)
+  const [professionalsError, setProfessionalsError] = useState('')
+  const [professionalsRetry, setProfessionalsRetry] = useState(0)
   const [clock, setClock] = useState(() => new Date())
   const [promotion, setPromotion] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -44,7 +48,24 @@ export default function Home() {
   const upcoming = !useNeon || usuario ? nextBooking(currentBookings, clock) : null
   const loadingBooking = useNeon && (carregando || (usuario && bookingState.uid !== usuario.uid))
   const bookingError = bookingState.uid === usuario?.uid ? bookingState.error : ''
-  const barber = upcoming && barbeiros.find(item => item.nome === upcoming.profissional)
+  const barber = upcoming && professionals.find(item => item.nome === upcoming.profissional)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    loadProfessionals(controller.signal)
+      .then(items => {
+        setProfessionals(items)
+        setProfessionalsError('')
+        setProfessionalsLoading(false)
+      })
+      .catch(cause => {
+        if (cause.name !== 'AbortError') {
+          setProfessionalsError(cause.message)
+          setProfessionalsLoading(false)
+        }
+      })
+    return () => controller.abort()
+  }, [professionalsRetry])
 
   useEffect(() => {
     if (!useNeon || carregando || !usuario) return
@@ -132,6 +153,11 @@ export default function Home() {
               : <><p>Você ainda não tem um agendamento futuro.</p><Link to="/servicos">Agendar horário</Link></>}
       </div>}
     </section>
-    <section className="section-block professionals-preview"><div className="section-title"><h2>Profissionais</h2><Link to="/profissionais">Ver todos</Link></div><div className="barber-track">{[barbeiros[3], ...barbeiros.slice(0, 2)].map((barber) => <BarberCard key={barber.nome} {...barber} />)}</div></section>
+    <section className="section-block professionals-preview"><div className="section-title"><h2>Profissionais</h2><Link to="/profissionais">Ver todos</Link></div>
+      {professionalsLoading && <p className="home-professionals-state" role="status">Carregando profissionais...</p>}
+      {!professionalsLoading && professionalsError && <div className="home-professionals-state" role="alert">{professionalsError} <button type="button" onClick={() => { setProfessionalsLoading(true); setProfessionalsRetry(value => value + 1) }}>Tentar novamente</button></div>}
+      {!professionalsLoading && !professionalsError && !professionals.length && <p className="home-professionals-state" role="status">Nenhum profissional cadastrado no momento.</p>}
+      {!professionalsLoading && !professionalsError && professionals.length > 0 && <div className="barber-track">{professionals.map(person => <BarberCard key={person.id} {...person} />)}</div>}
+    </section>
   </AppShell>
 }

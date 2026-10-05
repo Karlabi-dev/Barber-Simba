@@ -5,7 +5,6 @@
   overflow: hidden;
 }
 
-.home-screen .status-bar { flex-shrink: 0; }
 .home-screen .screen-content {
   flex: 1;
   min-height: 0;
@@ -19,12 +18,7 @@
 }
 
 .home-screen .brand-header {
-  position: sticky;
-  top: 0;
-  z-index: 3;
   height: 60px;
-  background: #0e0f10f5;
-  backdrop-filter: blur(12px);
 }
 
 .home-screen .navbar { position: relative; bottom: auto; margin-top: 8px; }
@@ -124,6 +118,8 @@
 .home-screen .appointment-empty p:last-child { margin-bottom: 0; }
 .home-screen .appointment-empty a, .home-screen .appointment-empty button { display: inline-block; border: 0; border-radius: 9px; background: var(--gold); color: #151515; padding: 10px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .home-screen .barber-card { min-width: 124px; padding: 12px; }
+.home-professionals-state { margin: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); font-size: 12px; }
+.home-professionals-state button { border: 0; padding: 4px; color: var(--gold); background: transparent; cursor: pointer; text-decoration: underline; }
 .home-screen .barber-avatar { width: 60px; height: 60px; }
 
 .home-promo-dialog { border: 1px solid #39352b; border-radius: 18px; padding: 44px 8px 8px; background: #101112; width: min(92vw, 580px); max-width: 92vw; max-height: 90svh; }
