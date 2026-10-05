@@ -107,6 +107,7 @@ export default function AdminServices() {
         <label>Categoria<input value={form.categoria} onChange={event => setForm({ ...form, categoria: event.target.value })} maxLength="120" required /></label>
         <label>Descrição<textarea value={form.descricao} onChange={event => setForm({ ...form, descricao: event.target.value })} maxLength="500" rows="2" /></label>
         <div className="admin-form-row"><label>Duração (min)<input type="number" min="1" max="1440" value={form.duracao} onChange={event => setForm({ ...form, duracao: event.target.value })} required /></label><label>Preço (R$)<input inputMode="decimal" value={form.preco} onChange={event => setForm({ ...form, preco: event.target.value })} placeholder="45,00" required /></label></div>
+        <label>Ícone<select value={form.iconKey} onChange={event => setForm({ ...form, iconKey: event.target.value })}><option value="tesoura">Tesoura</option><option value="barba">Barba</option><option value="narvalha">Navalha</option><option value="brilho">Brilho</option></select></label>
         <label className="admin-check"><input type="checkbox" checked={form.ativo} onChange={event => setForm({ ...form, ativo: event.target.checked })} /> Disponível para agendamento</label>
         {formError && <p className="admin-error" role="alert">{formError}</p>}
         <button className="admin-save" type="submit" disabled={saving}>{saving ? 'Salvando...' : editing ? 'Salvar alterações' : 'Salvar serviço'}</button>

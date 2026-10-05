@@ -130,7 +130,6 @@
 .button-secondary { border: 0; }
 .service-icon, .selected-service > span { flex-shrink: 0; }
 .service-icon img { width: 38px; height: 38px; }
-.selected-service img { width: 36px; height: 36px; }
 .review-card { --muted: #687482; --line: #e7e7e7; color-scheme: light; }
 .review-card small { color: #687482; }
 .review-row p { color: #687482; }
