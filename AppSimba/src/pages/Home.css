@@ -18,12 +18,7 @@
 }
 
 .home-screen .brand-header {
-  position: sticky;
-  top: 0;
-  z-index: 3;
   height: 60px;
-  background: #0e0f10f5;
-  backdrop-filter: blur(12px);
 }
 
 .home-screen .navbar { position: relative; bottom: auto; margin-top: 8px; }
