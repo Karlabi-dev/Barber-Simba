@@ -1,27 +1,7 @@
-/* Home-only layout: other screens keep their existing scroll behavior. */
-.app-shell.home-screen {
-  height: 100svh;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.home-screen .screen-content {
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior-y: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #454035 transparent;
-  padding-bottom: 24px;
-}
-
 .home-screen .brand-header {
   height: 60px;
 }
 
-.home-screen .navbar { position: relative; bottom: auto; margin-top: 8px; }
 .home-screen .greeting { margin: 14px 0 22px; }
 .home-screen .greeting h1 { font-size: 24px; margin-bottom: 7px; letter-spacing: -.7px; }
 .home-screen .greeting p { font-size: 11px; line-height: 1.5; }
@@ -128,9 +108,6 @@
 .home-promo-dialog form { position: absolute; top: 6px; right: 8px; }
 .home-promo-dialog form button { width: 32px; height: 32px; background: #252628; color: #fff; border: 0; border-radius: 50%; font-size: 24px; cursor: pointer; }
 
-@media (min-width: 700px) {
-  .app-shell.home-screen { height: min(860px, calc(100svh - 48px)); border-radius: 26px; border: 1px solid #343434; }
-}
 @media (max-width: 370px) {
   .home-screen .hero-card { padding: 18px 14px; }
   .home-screen .hero-card h2 { font-size: 18px; }
