@@ -12,7 +12,6 @@ const links = [
 export default function AdminPage({ title, onAdd, children }) {
   const { sair } = useAuth()
   return <main className="admin-shell">
-    <div className="admin-statusbar" aria-hidden="true"><strong>9:41</strong><span>▮▮▮ ))) ▰</span></div>
     <header className="admin-header">
       {title === 'PAINEL ADMIN' ? <span className="admin-mark" aria-hidden="true">♛</span> : <Link className="admin-back" to="/admin" aria-label="Voltar ao painel">‹</Link>}
       <h1>{title}</h1>

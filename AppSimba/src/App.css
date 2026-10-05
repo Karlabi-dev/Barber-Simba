@@ -1,7 +1,6 @@
 :root { --brown: #5b3528; --brown-dark: #382018; --gold: #c49a6c; --cream: #f7f4ef; --line: #e9e1d9; --muted: #786f69; --green: #287a50; }
 .app-shell { width: min(100%, 410px); min-height: 100svh; margin: 0 auto; background: #fff; position: relative; overflow: hidden; box-shadow: 0 0 35px #3921161c; padding-bottom: 88px; }
-.screen-content { padding: 0 20px 30px; }
-.status-bar { height: 44px; padding: 12px 24px; display: flex; justify-content: space-between; font-size: 12px; color: #201b18; }
+.screen-content { padding: 12px 20px 30px; }
 .brand-header, .page-header { height: 52px; display: flex; align-items: center; justify-content: space-between; }
 .brand { font-family: Inter, system-ui, sans-serif; font-size: 24px; font-weight: 700; display: flex; gap: 8px; align-items: center; }
 .brand span, .loading-brand span { color: var(--gold); }
@@ -58,7 +57,7 @@
 .review-row { padding: 18px 0; display: flex; gap: 16px; border-bottom: 1px solid var(--line); }.review-row:last-child { border: 0; padding-bottom: 0; }.review-row > img { width: 20px; height: 20px; object-fit: contain; padding: 2px; }.review-row span { display: grid; flex: 1; gap: 4px; }.review-row small { color: var(--muted); font-size: 9px; }.review-row strong { font-size: 11px; }.review-row p { margin: 0; font-size: 9px; color: var(--muted); line-height: 1.4; }
 .map-preview { height: 80px; border-radius: 8px; background: radial-gradient(circle, #d4b89d 1px, transparent 1px), #eee8e1; background-size: 14px 14px; display: grid; place-items: center; color: var(--brown); font-size: 25px; }
 .reminder { margin: 14px 6px; border-radius: 10px; background: #f5eee7; display: flex; align-items: center; gap: 10px; padding: 12px; }.reminder img { width: 20px; height: 20px; object-fit: contain; }.reminder p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.45; }
-.review-actions { display: grid; gap: 8px; }.success-screen { padding-bottom: 0; }.success-final { min-height: calc(100svh - 44px); display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 30px 18px; }.success-final h1 { font: 700 28px Inter, system-ui, sans-serif; margin: 15px 0 6px; }.success-final > p { margin: 0 0 25px; color: var(--muted); font-size: 12px; }.success-final .button { margin-top: 20px; }
+.review-actions { display: grid; gap: 8px; }.success-screen { padding-bottom: 0; }.success-final { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 30px 18px; }.success-final h1 { font: 700 28px Inter, system-ui, sans-serif; margin: 15px 0 6px; }.success-final > p { margin: 0 0 25px; color: var(--muted); font-size: 12px; }.success-final .button { margin-top: 20px; }
 .loading-screen { min-height: 100svh; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }.loading-brand { display: flex; align-items: center; gap: 14px; font: 700 48px Inter, system-ui, sans-serif; }.loading-brand span { font-size: 42px; }.loading-track { position: absolute; bottom: 11%; width: 128px; height: 4px; background: #eee8e2; border-radius: 10px; overflow: hidden; }.loading-track span { display: block; height: 100%; width: 42%; background: var(--brown); animation: load 1.2s ease-in-out infinite; }
 @keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(340%); } }
 @media (min-width: 700px) { body { padding: 24px 0; }.app-shell { min-height: 900px; border-radius: 28px; }.loading-screen { width: 410px; min-height: 900px; margin: 24px auto; border-radius: 28px; box-shadow: 0 0 35px #3921161c; }.success-final { min-height: 820px; } }
@@ -67,7 +66,6 @@
 /* Identidade visual fiel ao protótipo Barber Simba */
 :root { --brown: #920014; --brown-dark: #090a0b; --gold: #e5c158; --cream: #18191b; --line: #292a2b; --muted: #a4a2a2; --green: #287a50; }
 .app-shell { color: #fafdfd; background: #090a0b; box-shadow: 0 0 35px #0008; }
-.status-bar { color: #fafdfd; }
 .brand, .brand span, .loading-brand, .loading-brand span { color: var(--gold); }
 .profile-button, .icon-button { color: var(--gold); background: #59010c; border-color: #73000e; }
 .page-header h1 { color: var(--gold); text-transform: uppercase; }
@@ -134,7 +132,6 @@
 .availability-message button { padding: 0; border: 0; background: none; color: var(--gold); text-decoration: underline; cursor: pointer; font: inherit; }
 .booking-form select:disabled, .booking-form .button:disabled { opacity: .55; cursor: not-allowed; }
 .rating { color: var(--gold); }
-.status-bar { color: #fff; }
 .success-screen { background: #000; }
 .success-final { min-height: 800px; }
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }

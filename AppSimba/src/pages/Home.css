@@ -5,7 +5,6 @@
   overflow: hidden;
 }
 
-.home-screen .status-bar { flex-shrink: 0; }
 .home-screen .screen-content {
   flex: 1;
   min-height: 0;
