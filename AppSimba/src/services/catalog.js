@@ -1,11 +1,6 @@
-import scissors from '../assets/icons/tesoura.png'
-import beard from '../assets/icons/barba.png'
-import razor from '../assets/icons/narvalha.png'
-import sparkle from '../assets/icons/brilho.png'
+import logo from '../assets/logo.png'
 import profile from '../assets/icons/perfil.png'
 import allander from '../assets/allander.png'
-
-const icons = { tesoura: scissors, barba: beard, narvalha: razor, brilho: sparkle }
 
 export async function loadServices(signal) {
   const response = await fetch('/api/services', { signal })
@@ -15,7 +10,7 @@ export async function loadServices(signal) {
   return rows.map(item => ({
     ...item,
     preco: Number(item.preco).toLocaleString('pt-BR', { maximumFractionDigits: 2 }),
-    icon: icons[item.iconKey] || scissors,
+    icon: logo,
   }))
 }
 
