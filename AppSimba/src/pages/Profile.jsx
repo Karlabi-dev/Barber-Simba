@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import Header from '../components/Header'
 import PasswordInput from '../components/PasswordInput'
@@ -12,7 +13,8 @@ function readProfile() {
 }
 
 export default function Profile() {
-  const { usuario, atualizarPerfil, alterarEmail, alterarSenha } = useAuth()
+  const { usuario, atualizarPerfil, alterarEmail, alterarSenha, sair } = useAuth()
+  const navigate = useNavigate()
   const [tab, setTab] = useState('dados')
   const [profile, setProfile] = useState(readProfile)
   const [email, setEmail] = useState(usuario?.email || 'guilherme@gmail.com')
@@ -20,8 +22,15 @@ export default function Profile() {
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [editingEmail, setEditingEmail] = useState(false)
+  const [leaving, setLeaving] = useState(false)
   useEffect(() => { setEmail(usuario?.email || 'guilherme@gmail.com'); if (usuario?.displayName) setProfile(value => ({...value, nome:usuario.displayName})) }, [usuario])
+  useEffect(() => { if (leaving && !usuario) navigate('/login', { replace: true }) }, [leaving, usuario, navigate])
   function change(event) { setProfile({...profile, [event.target.name]: event.target.value}) }
+  async function handleSignOut() {
+    setError(''); setNotice(''); setLeaving(true)
+    try { await sair() }
+    catch { setLeaving(false); setError('Não foi possível sair da conta. Tente novamente.') }
+  }
   async function saveProfile(event) {
     event.preventDefault(); setError(''); setNotice('')
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); if (usuario && profile.nome.trim()) await atualizarPerfil(usuario, {displayName:profile.nome.trim()}); setNotice('Dados salvos com sucesso.') }
@@ -40,5 +49,6 @@ export default function Profile() {
     {tab === 'dados' && <form className="profile-form" onSubmit={saveProfile}><h2>Meus dados</h2><label>Nome *<input name="nome" value={profile.nome} onChange={change} required /></label><label>Data nascimento (opcional)<input name="nascimento" type="date" value={profile.nascimento} onChange={change} /></label><label>Celular *<input name="celular" value={profile.celular} onChange={change} required /></label><fieldset><legend>Gênero (opcional)</legend>{['Feminino','Masculino','Outros'].map(value => <label className="radio-label" key={value}><input type="radio" name="genero" value={value} checked={profile.genero === value} onChange={change} />{value}</label>)}</fieldset><button className="profile-primary" type="submit">Salvar</button><button className="profile-secondary" type="button" onClick={() => setNotice('A exclusão da conta será integrada em uma próxima etapa.')}>Excluir conta</button></form>}
     {tab === 'seguranca' && <form className="profile-form" onSubmit={saveSecurity}><h2>Segurança</h2><PasswordInput label="Senha atual *" value={senha.atual} onChange={event => setSenha({...senha, atual:event.target.value})} placeholder="Senha atual" autoComplete="current-password" /><PasswordInput label="Nova senha *" value={senha.nova} onChange={event => setSenha({...senha, nova:event.target.value})} placeholder="Nova senha" autoComplete="new-password" /><PasswordInput label="Confirmação da senha *" value={senha.confirmar} onChange={event => setSenha({...senha, confirmar:event.target.value})} placeholder="Confirmação de senha" autoComplete="new-password" /><div className="profile-access"><div><strong>Acessos</strong><span>{email}<small>E-mail e senha</small></span></div><button type="button" onClick={() => setEditingEmail(value => !value)}>{editingEmail ? 'Cancelar' : 'Alterar email'}</button>{editingEmail && <input type="email" value={email} onChange={event => setEmail(event.target.value)} aria-label="Novo e-mail" />}</div><button className="profile-primary" type="submit">Salvar</button></form>}
     {tab === 'sobre' && <section className="profile-about"><h2>Sobre</h2><p>Em breve informações do estabelecimento.</p></section>}
+    {usuario && <button className="profile-signout" type="button" onClick={handleSignOut} disabled={leaving}>{leaving ? 'Saindo...' : 'Sair da conta'}</button>}
   </AppShell>
 }
