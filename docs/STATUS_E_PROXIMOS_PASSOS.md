@@ -11,7 +11,7 @@ Para a visão completa do sistema e os passos de configuração, consulte o [Gui
 - O administrador gerencia serviços, equipe, horários e agenda, e pode vincular uma conta Firebase já criada ao profissional.
 - O barbeiro vinculado vê os próprios agendamentos e pode passar um atendimento de `confirmado` para `em_atendimento` e depois `concluido`. Não pode cancelar ou excluir.
 - O fluxo do barbeiro foi testado manualmente com uma conta e um agendamento reais. A migração `005_professional_accounts.sql` está aplicada em `dev-simba-integracao` e `production`; o SQL Editor na branch `production` confirmou o registro e a tabela `professional_accounts`.
-- A API e o frontend ainda rodam localmente; a aplicação não foi publicada. As notificações e avaliações atuais são demonstrações locais ou telas informativas, sem persistência na API.
+- A API e o frontend ainda rodam localmente; a aplicação não foi publicada. O [guia de publicação no Render](DEPLOY_RENDER.md) e o Blueprint preparam a homologação, mas a URL pública ainda depende da criação do serviço e da configuração dos segredos. As notificações e avaliações atuais são demonstrações locais ou telas informativas, sem persistência na API.
 
 ## Próximas tarefas, na ordem planejada
 
