@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: simba-homologacao
+    runtime: node
+    plan: free
+    autoDeployTrigger: off
+    buildCommand: npm ci --prefix api && npm ci --prefix AppSimba --include=dev && npm run build --prefix AppSimba
+    startCommand: node api/src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: VITE_USE_NEON
+        value: "true"
+      - key: SERVE_FRONTEND
+        value: "true"
+      - key: FIREBASE_PROJECT_ID
+        value: barber-simba
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/firebase-admin.json
+      - key: DATABASE_URL
+        sync: false
